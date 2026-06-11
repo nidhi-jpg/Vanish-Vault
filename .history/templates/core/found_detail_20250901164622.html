@@ -1,0 +1,419 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ person.possible_name|default:"Unidentified Person" }} - Found Person Details{% endblock %}
+
+{% block content %}
+<!-- Found Person Header -->
+<div class="found-header mb-4">
+    <div class="row align-items-center">
+        <div class="col-12 col-md-8">
+            <div class="found-title-section">
+                <h1 class="found-title">{{ person.possible_name|default:"Unidentified Person" }}</h1>
+                <div class="found-meta-info">
+                    <span class="badge bg-{% if person.status == 'identified' %}success{% elif person.status == 'pending' %}warning{% else %}secondary{% endif %} me-2">
+                        {{ person.get_status_display }}
+                    </span>
+                    {% if person.case_id %}
+                        <span class="badge bg-secondary me-2">{{ person.case_id }}</span>
+                    {% endif %}
+                    {% if person.days_found %}
+                        <span class="badge bg-info">{{ person.days_found }} days found</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4 text-md-end">
+            <div class="found-actions-header">
+                <button class="btn btn-primary btn-sm me-2" onclick="checkMatches()">
+                    <i class="bi bi-search me-1"></i>Check Matches
+                </button>
+                <a href="{% url 'core:found_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Found Person Content -->
+<div class="row">
+    <div class="col-12 col-lg-4">
+        <!-- Photo Section -->
+        <div class="found-photo-section mb-4">
+            <div class="photo-container">
+                {% if person.photo %}
+                    <img src="{{ person.photo.url }}" class="found-photo-large" alt="{{ person.possible_name|default:'Found Person' }}">
+                {% else %}
+                    <div class="photo-placeholder-large">
+                        <i class="bi bi-person"></i>
+                    </div>
+                {% endif %}
+                <div class="photo-overlay">
+                    <button class="btn btn-light btn-sm" onclick="viewFullPhoto()">
+                        <i class="bi bi-zoom-in me-1"></i>View Full Size
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Info Card -->
+        <div class="quick-info-card">
+            <h6 class="card-title">
+                <i class="bi bi-info-circle me-2"></i>Quick Information
+            </h6>
+            <div class="quick-info-list">
+                <div class="info-item">
+                    <i class="bi bi-calendar text-primary"></i>
+                    <span><strong>Age:</strong> {{ person.estimated_age|default:"Unknown" }} years</span>
+                </div>
+                <div class="info-item">
+                    <i class="bi bi-person text-primary"></i>
+                    <span><strong>Gender:</strong> {{ person.get_gender_display }}</span>
+                </div>
+                <div class="info-item">
+                    <i class="bi bi-geo-alt text-primary"></i>
+                    <span><strong>Found At:</strong> {{ person.found_location }}</span>
+                </div>
+                <div class="info-item">
+                    <i class="bi bi-clock text-primary"></i>
+                    <span><strong>Date:</strong> {{ person.found_date|date:"M j, Y" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match Status Card -->
+        <div class="match-status-card">
+            <h6 class="card-title">
+                <i class="bi bi-search me-2"></i>Match Status
+            </h6>
+            <div class="match-status-content">
+                {% if person.status == 'identified' %}
+                    <div class="match-success">
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        <span>Person has been identified</span>
+                    </div>
+                {% elif person.status == 'pending' %}
+                    <div class="match-pending">
+                        <i class="bi bi-clock-fill text-warning"></i>
+                        <span>Awaiting identification</span>
+                    </div>
+                {% else %}
+                    <div class="match-unknown">
+                        <i class="bi bi-question-circle-fill text-muted"></i>
+                        <span>No matches found yet</span>
+                    </div>
+                {% endif %}
+                <button class="btn btn-primary btn-sm w-100 mt-2" onclick="checkMatches()">
+                    <i class="bi bi-search me-1"></i>Search for Matches
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-lg-8">
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs found-tabs" id="foundTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab">
+                    <i class="bi bi-person me-2"></i>Details
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="physical-tab" data-bs-toggle="tab" data-bs-target="#physical" type="button" role="tab">
+                    <i class="bi bi-rulers me-2"></i>Physical
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="matches-tab" data-bs-toggle="tab" data-bs-target="#matches" type="button" role="tab">
+                    <i class="bi bi-search me-2"></i>Potential Matches
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab">
+                    <i class="bi bi-telephone me-2"></i>Contact
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content found-tab-content" id="foundTabContent">
+            <!-- Details Tab -->
+            <div class="tab-pane fade show active" id="details" role="tabpanel">
+                <div class="tab-card">
+                    <h5 class="tab-title">
+                        <i class="bi bi-info-circle me-2"></i>Found Person Details
+                    </h5>
+                    
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Possible Name</div>
+                            <div class="detail-value">{{ person.possible_name|default:"Unknown" }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Case ID</div>
+                            <div class="detail-value">{{ person.case_id|default:"Not assigned" }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Status</div>
+                            <div class="detail-value">
+                                <span class="badge bg-{% if person.status == 'identified' %}success{% elif person.status == 'pending' %}warning{% else %}secondary{% endif %}">
+                                    {{ person.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Found On</div>
+                            <div class="detail-value">{{ person.found_date|date:"F j, Y g:i A" }}</div>
+                        </div>
+                    </div>
+
+                    {% if person.notes %}
+                    <div class="description-section">
+                        <h6>Additional Information</h6>
+                        <p class="description-text">{{ person.notes }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Physical Tab -->
+            <div class="tab-pane fade" id="physical" role="tabpanel">
+                <div class="tab-card">
+                    <h5 class="tab-title">
+                        <i class="bi bi-rulers me-2"></i>Physical Description
+                    </h5>
+                    
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Age</div>
+                            <div class="detail-value">{{ person.estimated_age|default:"Unknown" }} years old</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Gender</div>
+                            <div class="detail-value">{{ person.get_gender_display }}</div>
+                        </div>
+                        {% if person.height %}
+                        <div class="detail-item">
+                            <div class="detail-label">Height</div>
+                            <div class="detail-value">{{ person.height }}</div>
+                        </div>
+                        {% endif %}
+                        {% if person.weight %}
+                        <div class="detail-item">
+                            <div class="detail-label">Weight</div>
+                            <div class="detail-value">{{ person.weight }}</div>
+                        </div>
+                        {% endif %}
+                        {% if person.hair_color %}
+                        <div class="detail-item">
+                            <div class="detail-label">Hair Color</div>
+                            <div class="detail-value">{{ person.hair_color }}</div>
+                        </div>
+                        {% endif %}
+                        {% if person.eye_color %}
+                        <div class="detail-item">
+                            <div class="detail-label">Eye Color</div>
+                            <div class="detail-value">{{ person.eye_color }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% if person.distinguishing_features %}
+                    <div class="features-section">
+                        <h6>Distinguishing Features</h6>
+                        <p class="features-text">{{ person.distinguishing_features }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Potential Matches Tab -->
+            <div class="tab-pane fade" id="matches" role="tabpanel">
+                <div class="tab-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="tab-title mb-0">
+                            <i class="bi bi-search me-2"></i>Potential Matches
+                        </h5>
+                        <button class="btn btn-primary btn-sm" onclick="checkMatches()">
+                            <i class="bi bi-search me-1"></i>Search Again
+                        </button>
+                    </div>
+
+                    <div class="matches-list">
+                        <!-- Placeholder for potential matches -->
+                        <div class="match-item">
+                            <div class="match-header">
+                                <div class="match-case">
+                                    <strong>Case: #MV-2024-001</strong>
+                                    <span class="text-muted">- John Doe</span>
+                                </div>
+                                <div class="match-confidence">
+                                    <span class="badge bg-success">85% Match</span>
+                                </div>
+                            </div>
+                            <div class="match-content">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="match-details">
+                                            <p><strong>Missing Since:</strong> March 10, 2024</p>
+                                            <p><strong>Last Seen:</strong> Downtown Mall</p>
+                                            <p><strong>Age:</strong> 25 years (matches found person)</p>
+                                            <p><strong>Description:</strong> Similar physical characteristics and clothing</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="match-actions">
+                                            <button class="btn btn-success btn-sm me-2" onclick="confirmMatch(1)">
+                                                <i class="bi bi-check me-1"></i>Confirm Match
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-sm me-2" onclick="viewMatchDetails(1)">
+                                                <i class="bi bi-eye me-1"></i>View Details
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm" onclick="rejectMatch(1)">
+                                                <i class="bi bi-x me-1"></i>Not a Match
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="no-matches" style="display: none;">
+                            <div class="empty-state-small">
+                                <i class="bi bi-search"></i>
+                                <p>No potential matches found</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Tab -->
+            <div class="tab-pane fade" id="contact" role="tabpanel">
+                <div class="tab-card">
+                    <h5 class="tab-title">
+                        <i class="bi bi-telephone me-2"></i>Contact Information
+                    </h5>
+                    
+                    <div class="contact-info-full">
+                        <div class="contact-item">
+                            <div class="contact-label">Organization</div>
+                            <div class="contact-value">{{ person.found_by_organization }}</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-label">Contact Person</div>
+                            <div class="contact-value">{{ person.contact_person }}</div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-label">Phone</div>
+                            <div class="contact-value">
+                                <a href="tel:{{ person.contact_phone }}" class="contact-link">
+                                    <i class="bi bi-telephone me-1"></i>{{ person.contact_phone }}
+                                </a>
+                            </div>
+                        </div>
+                        {% if person.contact_email %}
+                        <div class="contact-item">
+                            <div class="contact-label">Email</div>
+                            <div class="contact-value">
+                                <a href="mailto:{{ person.contact_email }}" class="contact-link">
+                                    <i class="bi bi-envelope me-1"></i>{{ person.contact_email }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Match Confirmation Modal -->
+<div class="modal fade" id="matchModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-check-circle me-2"></i>Confirm Match
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'core:confirm_match' person.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>Match Confirmed!</strong> This will link the found person with the missing person case.
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Confirmation Notes</label>
+                            <textarea name="confirmation_notes" class="form-control" rows="3" placeholder="Add any additional notes about this match confirmation..."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="notify_family" id="notifyFamily" checked>
+                                <label class="form-check-label" for="notifyFamily">
+                                    Notify the missing person's family
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check me-2"></i>Confirm Match
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function checkMatches() {
+    // Show loading state
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Searching...';
+    button.disabled = true;
+    
+    // Simulate search process
+    setTimeout(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+        
+        // In a real app, this would make an AJAX request to search for matches
+        alert('Search completed! Found 1 potential match.');
+        
+        // Show matches tab
+        document.getElementById('matches-tab').click();
+    }, 2000);
+}
+
+function confirmMatch(matchId) {
+    // In a real app, this would open the match confirmation modal
+    document.getElementById('matchModal').style.display = 'block';
+    // For now, just show alert
+    alert('Match confirmation modal would open here');
+}
+
+function viewMatchDetails(matchId) {
+    // In a real app, this would open the missing person details
+    alert('Viewing missing person details for match ID: ' + matchId);
+}
+
+function rejectMatch(matchId) {
+    if (confirm('Are you sure this is not a match?')) {
+        alert('Match rejected successfully');
+    }
+}
+
+function viewFullPhoto() {
+    // In a real app, this would open a lightbox or full-screen photo viewer
+    alert('Full photo viewer would open here');
+}
+</script>
+{% endblock %}

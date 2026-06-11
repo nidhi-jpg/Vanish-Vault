@@ -1,0 +1,178 @@
+/* VanishVault Dark Theme - Using specified color tokens */
+:root {
+  --bg-base: #0B0F14;
+  --bg-card: #111827;
+  --text-primary: #F5F7FA;
+  --text-muted: #9AA4B2;
+  --primary: #00ADB5;
+  --primary-dark: #008B91;
+  --accent: #FF6B35;
+  --accent-dark: #E55A2B;
+  --radius: 16px;
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.15);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* Base styles */
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+}
+
+.dark-theme {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+}
+/* Background gradient */
+body { 
+  background: radial-gradient(1000px 480px at 15% -10%, rgba(0, 173, 181, 0.08), transparent),
+             radial-gradient(900px 420px at 85% -15%, rgba(255, 107, 53, 0.06), transparent),
+             var(--bg-base); 
+}
+.bg-surface{ background-color: var(--surface)!important; }
+.navbar-brand { letter-spacing: 0.3px; }
+.btn-ghost{ background: transparent; border: 0; }
+.gradient-text{ background: linear-gradient(90deg,#ef4444 0%, #f97316 40%, #a855f7 100%); -webkit-background-clip:text; background-clip:text; color: transparent; }
+.card img { object-fit: cover; height: 180px; }
+@media (max-width: 576px) {
+  .card img { height: 140px; }
+}
+
+/* Elevation and rounded corners */
+.card { border: 1px solid var(--card-border); box-shadow: var(--shadow); border-radius: 1rem; overflow: hidden; }
+.btn { border-radius: .5rem; }
+.form-control, .form-select { border-radius: .5rem; }
+
+/* Utility colors */
+.badge-soft{ background: rgba(239,68,68,.10); color:#fecaca; border:1px solid rgba(239,68,68,.20)}
+.chip{ display:inline-flex; align-items:center; gap:.35rem; padding:.35rem .6rem; border-radius:999px; border:1px solid var(--card-border); background: var(--surface); color: var(--muted); font-size:.85rem }
+.chip i{ color: var(--primary) }
+.btn-gradient{ background: linear-gradient(90deg, var(--primary), var(--accent)); color:#fff; border: 0; box-shadow: 0 6px 16px rgba(239,68,68,.25) }
+.btn-gradient:hover{ filter: brightness(1.05) }
+
+/* Hero tweaks */
+.hero { position: relative; overflow: hidden; background: var(--surface); border: 1px solid var(--card-border); border-radius: 1rem; box-shadow: 0 0 0 1px rgba(239,68,68,.08), 0 0 40px var(--glow-red); }
+.hero::before{ content:""; position:absolute; inset:-20%; background: conic-gradient(from 180deg at 50% 50%, rgba(239,68,68,.25), rgba(168,85,247,.20), rgba(34,197,94,.15), rgba(239,68,68,.25)); filter: blur(60px); animation: rotate 14s linear infinite; }
+.hero::after{ content:""; position:absolute; inset:auto auto -30% -30%; width: 60%; height: 60%; background: radial-gradient(60% 60% at 50% 50%, var(--glow-red-strong), transparent 70%); filter: blur(30px); transform: rotate(12deg); }
+@keyframes rotate{ to{ transform: rotate(360deg); } }
+
+/* Red glow utility */
+.red-glow{ box-shadow: 0 0 0 1px rgba(239,68,68,.25), 0 0 28px var(--glow-red) !important; }
+
+/* Glass effect */
+.glass{ background: rgba(15,22,41,.5); border: 1px solid rgba(255,255,255,.08); backdrop-filter: blur(10px); }
+
+/* Hover and transitions */
+.card, .btn, .form-control, .form-select, .navbar, .hero { transition: all .2s ease; }
+.card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(15,23,42,.22); }
+
+/* Section headings */
+.section-title{ display:flex; align-items:center; gap:.6rem; font-weight:700 }
+.section-title .bar{ width:28px; height:6px; border-radius:999px; background: linear-gradient(90deg, var(--primary), #f97316); box-shadow: 0 0 20px var(--glow-red); }
+
+/* Card meta */
+.meta{ display:flex; flex-wrap:wrap; gap:.4rem }
+.meta .pill{ background: rgba(255,255,255,.06); color: var(--muted); border:1px solid var(--card-border); border-radius: 999px; padding:.2rem .5rem; font-size:.75rem }
+
+/* Reveal on scroll */
+.reveal{ opacity: 0; transform: translateY(8px); }
+.reveal.show{ opacity: 1; transform: none; transition: all .4s ease; }
+
+/* Shimmer skeleton */
+.shimmer{ position: relative; overflow: hidden; background: linear-gradient(90deg, #0f172a 25%, #111827 37%, #0f172a 63%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; }
+@keyframes shimmer{ 0%{ background-position: 100% 0 } 100%{ background-position: -100% 0 } }
+
+/* Navbar active state */
+.navbar .nav-link.active, .navbar .nav-link[aria-current="page"]{ color: var(--text); position: relative; }
+.navbar .nav-link.active::after, .navbar .nav-link[aria-current="page"]::after{
+  content:""; position:absolute; left: .5rem; right: .5rem; bottom: .2rem; height: 2px; border-radius: 999px; background: var(--primary);
+  box-shadow: 0 0 12px var(--glow-red);
+}
+
+/* Remove custom found_list UI overrides and revert to previous styles */
+/* If you want to fully revert, just delete this block from your CSS file. 
+   If you want to keep for reference, comment it out as below: */
+
+/*
+.results-section {
+    margin-top: 2rem;
+}
+.case-card {
+    border-radius: 1rem;
+    background: #222831;
+    color: #fff;
+    padding: 1.5rem;
+    box-shadow: 0 4px 24px rgba(0, 173, 181, 0.08);
+    transition: box-shadow 0.3s, transform 0.2s;
+}
+.case-card:hover {
+    box-shadow: 0 8px 32px rgba(0, 173, 181, 0.18);
+    transform: translateY(-4px) scale(1.02);
+}
+.case-photo, .case-photo-placeholder {
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    background: #393e46;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: #00adb5;
+}
+.case-photo-placeholder i {
+    font-size: 3rem;
+}
+.case-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+.case-location {
+    font-size: 1rem;
+    color: #aaa;
+    margin-bottom: 0.5rem;
+}
+.case-meta {
+    font-size: 0.95rem;
+    color: #bbb;
+}
+.case-badges .badge {
+    margin-right: 0.25rem;
+    font-size: 0.85rem;
+}
+.filter-card {
+    background: #23272b;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.form-label {
+    color: #00adb5;
+    font-weight: 600;
+}
+input, select {
+    background: #222831 !important;
+    color: #fff !important;
+    border: 1px solid #393e46 !important;
+}
+input:focus, select:focus {
+    border-color: #00adb5 !important;
+    box-shadow: 0 0 0 0.2rem rgba(0,173,181,0.15);
+}
+.btn-primary, .btn-outline-primary {
+    border-radius: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+.btn-primary:hover, .btn-outline-primary:hover {
+    background: #00adb5;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0,173,181,0.15);
+}
+*/
+
+/* ...existing code... */

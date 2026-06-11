@@ -1,0 +1,13 @@
+from django.urls import path
+from . import views
+
+
+urlpatterns = [
+    path('', views.home, name='home'),
+    path('search/', views.search, name='search'),
+    path('found/', views.found_list, name='found_list'),
+    path('about/', lambda r: __import__('django').shortcuts.render(r, 'about.html'), name='about'),
+    path('contact/', lambda r: __import__('django').shortcuts.render(r, 'contact.html'), name='contact'),
+]
+
+

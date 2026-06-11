@@ -1,0 +1,24 @@
+{% extends "admin/index.html" %}
+{% load i18n static %}
+
+{% block content %}
+{{ block.super }}
+
+{% if user.is_authenticated and user.is_staff %}
+<div style="margin: 30px 0; padding: 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+        <div style="color: white;">
+            <h2 style="margin: 0 0 10px 0; color: white; font-size: 24px;">
+                <i class="bi bi-speedometer2" style="margin-right: 10px;"></i>Admin Dashboard
+            </h2>
+            <p style="margin: 0; opacity: 0.9; font-size: 16px;">
+                Verify users, review cases, and manage AI matches from the full dashboard interface.
+            </p>
+        </div>
+        <a href="{% url 'core:dashboard' %}" style="display: inline-block; padding: 12px 30px; background: white; color: #667eea; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: transform 0.2s; white-space: nowrap; margin-top: 15px;">
+            <i class="bi bi-speedometer2" style="margin-right: 8px;"></i>Open Dashboard
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

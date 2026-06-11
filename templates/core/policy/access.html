@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+{% block title %}Access & Verification Policy – VanishVault{% endblock %}
+{% block content %}
+<div class="container-xxl">
+  <div class="row">
+    <div class="col-12 col-lg-10 mx-auto">
+      <div class="card card-glass border-0 shadow-sm">
+        <div class="card-body p-4 p-md-5">
+          <h1 class="h3 mb-3">Access & Verification Policy</h1>
+          <p class="text-white-50 mb-4">This page explains who can access which features and what documents are required during registration.</p>
+
+          <h2 class="h5 mt-4">Roles</h2>
+          <ul>
+            <li><strong>Citizen</strong>: Public reporting and search</li>
+            <li><strong>Volunteer</strong>: Supports NGOs; needs verification for found reports</li>
+            <li><strong>NGO Worker</strong>: Organization-backed; can report found persons after verification</li>
+            <li><strong>Police Officer</strong>: Case verification and management after verification</li>
+            <li><strong>Admin</strong>: Full system access</li>
+          </ul>
+
+          <h2 class="h5 mt-4">What you can do</h2>
+          <ul>
+            <li><strong>Everyone</strong>: View Home, Search, Missing/Found details.</li>
+            <li><strong>Citizens</strong>: Report Missing person and submit Sightings of missing persons.</li>
+            <li><strong>Authenticated</strong>: Report Missing Person</li>
+            <li><strong>Verified NGO/Volunteer</strong>: Report Found Person</li>
+            <li><strong>Verified Police/Admin</strong>: Dashboard and verification tools</li>
+          </ul>
+
+          <h2 class="h5 mt-4">Who verifies what</h2>
+          <ul>
+            <li><strong>Admin</strong>: Reviews and verifies user documents for Police, NGO, and Volunteer accounts.</li>
+            <li><strong>Police</strong>: Verify and approve cases in the Dashboard.</li>
+          </ul>
+
+          <h2 class="h5 mt-4">Verification requirements</h2>
+          <ul>
+            <li><strong>Citizen</strong>: No documents. Auto-verified.</li>
+            <li><strong>Volunteer</strong>: Organization required. Admin verification required.</li>
+            <li><strong>NGO Worker</strong>: Organization and ID document required. Admin verification required.</li>
+            <li><strong>Police Officer</strong>: Organization and official ID required. Admin verification required.</li>
+          </ul>
+
+          <h2 class="h5 mt-4">Notes</h2>
+          <ul>
+            <li>Until verification, non-citizen roles have limited access.</li>
+            <li>Admins review documents and approve verification.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,529 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Search Missing Persons - VanishVault{% endblock %}
+
+{% block extra_head %}
+<style>
+    .search-page {
+        padding: 2rem 0;
+        min-height: 100vh;
+    }
+
+    .page-header-section {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        padding: 1.5rem 0;
+    }
+
+    .page-header-section h1 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: rgba(255,255,255,0.95);
+        margin-bottom: 0.5rem;
+    }
+
+    .page-header-section h1 i {
+        color: rgba(0,173,181,0.7);
+    }
+
+    .page-header-section p {
+        color: rgba(255,255,255,0.6);
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Clean Search Bar */
+    .search-bar {
+        background: rgba(17,24,39,0.6);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .search-input-group {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+    }
+
+    .search-input-group input {
+        flex: 1;
+        background: rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        color: rgba(255,255,255,0.9);
+        font-size: 0.95rem;
+    }
+
+    .search-input-group input:focus {
+        outline: none;
+        border-color: rgba(0,173,181,0.5);
+        box-shadow: 0 0 0 3px rgba(0,173,181,0.15);
+    }
+
+    .search-input-group input::placeholder {
+        color: rgba(255,255,255,0.4);
+    }
+
+    .search-input-group i {
+        color: rgba(0,173,181,0.6);
+    }
+
+    /* Filters Section */
+    .filters-section {
+        background: rgba(17,24,39,0.4);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .filters-toggle {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        padding: 0.5rem 0;
+        margin-bottom: 1rem;
+        color: rgba(255,255,255,0.8);
+    }
+
+    .filters-toggle:hover {
+        color: rgba(0,173,181,0.8);
+    }
+
+    .filters-toggle i {
+        color: rgba(0,173,181,0.6);
+    }
+
+    .filters-content {
+        display: none;
+    }
+
+    .filters-content.show {
+        display: block;
+    }
+
+    .filter-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .filter-group label {
+        display: block;
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.7);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .filter-group label i {
+        color: rgba(0,173,181,0.6);
+        margin-right: 0.25rem;
+    }
+
+    .filter-group input,
+    .filter-group select {
+        width: 100%;
+        background: rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 6px;
+        padding: 0.6rem;
+        color: rgba(255,255,255,0.9);
+        font-size: 0.9rem;
+    }
+
+    .filter-group input:focus,
+    .filter-group select:focus {
+        outline: none;
+        border-color: rgba(0,173,181,0.5);
+        box-shadow: 0 0 0 2px rgba(0,173,181,0.1);
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* Results Section */
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .results-header h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: rgba(255,255,255,0.9);
+        margin: 0;
+    }
+
+    .results-count {
+        color: rgba(255,255,255,0.6);
+        font-size: 0.9rem;
+    }
+
+    /* Results Grid */
+    .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .result-card {
+        background: rgba(17,24,39,0.6);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .result-card:hover {
+        border-color: rgba(0,173,181,0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 20px rgba(0,173,181,0.1);
+    }
+
+    .result-card-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        background: rgba(0,0,0,0.3);
+    }
+
+    .result-card-body {
+        padding: 1.25rem;
+    }
+
+    .result-card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: rgba(255,255,255,0.95);
+        margin-bottom: 0.75rem;
+    }
+
+    .result-card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.6);
+    }
+
+    .result-card-meta i {
+        margin-right: 0.25rem;
+        color: rgba(0,173,181,0.6);
+    }
+
+    .result-card-actions {
+        display: flex;
+        gap: 0.75rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .result-card-actions .btn {
+        flex: 1;
+        padding: 0.6rem;
+        font-size: 0.85rem;
+        border-radius: 6px;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+        color: rgba(0,173,181,0.3);
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: rgba(255,255,255,0.9);
+        margin-bottom: 0.75rem;
+    }
+
+    .empty-state p {
+        color: rgba(255,255,255,0.6);
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Status Badge */
+    .status-badge {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-badge.verified {
+        background: rgba(34,197,94,0.2);
+        color: #22c55e;
+        border: 1px solid rgba(34,197,94,0.3);
+    }
+
+    .status-badge.pending {
+        background: rgba(255,211,105,0.2);
+        color: #ffd369;
+        border: 1px solid rgba(255,211,105,0.3);
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: rgba(0,173,181,0.15);
+        border: 1px solid rgba(0,173,181,0.4);
+        color: rgba(0,173,181,0.95);
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: rgba(0,173,181,0.25);
+        border-color: rgba(0,173,181,0.6);
+        color: rgba(0,173,181,1);
+        box-shadow: 0 4px 12px rgba(0,173,181,0.2);
+    }
+
+    .btn-outline-primary {
+        background: transparent;
+        border: 1px solid rgba(255,255,255,0.2);
+        color: rgba(255,255,255,0.8);
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover {
+        background: rgba(255,255,255,0.05);
+        border-color: rgba(0,173,181,0.4);
+        color: rgba(0,173,181,0.9);
+    }
+
+    /* Report Sighting Button - Special accent */
+    .result-card-actions .btn-primary {
+        background: rgba(34,197,94,0.15);
+        border-color: rgba(34,197,94,0.4);
+        color: rgba(34,197,94,0.9);
+    }
+
+    .result-card-actions .btn-primary:hover {
+        background: rgba(34,197,94,0.25);
+        border-color: rgba(34,197,94,0.6);
+        color: rgba(34,197,94,1);
+        box-shadow: 0 4px 12px rgba(34,197,94,0.2);
+    }
+
+    @media (max-width: 768px) {
+        .results-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-row {
+            grid-template-columns: 1fr;
+        }
+
+        .search-input-group {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-page">
+    <div class="container-xxl">
+        <!-- Page Header -->
+        <div class="page-header-section">
+            <h1><i class="bi bi-search me-2"></i>Search Missing Persons</h1>
+            <p>Find your loved ones in our verified database</p>
+            <div class="d-flex gap-2 justify-content-center flex-wrap">
+                <a href="{% url 'core:report_missing' %}" class="btn btn-primary">
+                    <i class="bi bi-person-plus me-2"></i>Report Missing Person
+                </a>
+                <a href="{% url 'core:found_list' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-people me-2"></i>View Found Persons
+                </a>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar glass">
+            <form method="get" id="searchForm">
+                <div class="search-input-group">
+                    <i class="bi bi-search" style="color: rgba(255,255,255,0.5); font-size: 1.1rem;"></i>
+                    <input type="text" name="q" class="form-control" 
+                           placeholder="Search by name, location, or keywords..." 
+                           value="{{ query }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search me-1"></i>Search
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section glass">
+            <div class="filters-toggle" onclick="toggleFilters()">
+                <span style="font-weight: 500; color: rgba(255,255,255,0.8);">
+                    <i class="bi bi-sliders me-2"></i>Filters
+                </span>
+                <i class="bi bi-chevron-down" id="filtersIcon"></i>
+            </div>
+            <div class="filters-content" id="filtersContent">
+                <form method="get" id="filterForm">
+                    <input type="hidden" name="q" value="{{ query }}">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label><i class="bi bi-geo-alt me-1"></i>Location</label>
+                            <input type="text" name="location" placeholder="City, state, or region..." value="{{ location_val }}">
+                        </div>
+                        <div class="filter-group">
+                            <label><i class="bi bi-gender-ambiguous me-1"></i>Gender</label>
+                            <select name="gender">
+                                <option value="">All</option>
+                                <option value="male" {% if gender_val == 'male' %}selected{% endif %}>Male</option>
+                                <option value="female" {% if gender_val == 'female' %}selected{% endif %}>Female</option>
+                                <option value="other" {% if gender_val == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label><i class="bi bi-calendar3 me-1"></i>Age Range</label>
+                            <div class="d-flex gap-2">
+                                <input type="number" name="age_min" placeholder="Min" value="{{ age_min_val }}" min="0" max="120">
+                                <input type="number" name="age_max" placeholder="Max" value="{{ age_max_val }}" min="0" max="120">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-funnel me-1"></i>Apply Filters
+                        </button>
+                        <a href="{% url 'core:search' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-x-circle me-1"></i>Clear
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        {% if results %}
+        <div class="results-header">
+            <div>
+                <h3>Search Results</h3>
+                <p class="results-count mb-0">Found {{ results.count }} matching case{{ results.count|pluralize }}</p>
+            </div>
+        </div>
+
+        <div class="results-grid">
+            {% for person in results %}
+            <div class="result-card">
+                <div class="position-relative">
+                    {% if person.photo %}
+                        <img src="{{ person.photo.url }}" class="result-card-image" alt="{{ person.full_name }}" loading="lazy">
+                    {% else %}
+                        <div class="result-card-image d-flex align-items-center justify-content-center">
+                            <i class="bi bi-person" style="font-size: 3rem; color: rgba(255,255,255,0.3);"></i>
+                        </div>
+                    {% endif %}
+                    <span class="status-badge {% if person.status == 'verified' %}verified{% else %}pending{% endif %}">
+                        {{ person.get_status_display }}
+                    </span>
+                </div>
+                <div class="result-card-body">
+                    <h4 class="result-card-title">{{ person.full_name }}</h4>
+                    <div class="result-card-meta">
+                        {% if person.age %}
+                            <span><i class="bi bi-calendar3"></i>{{ person.age }} yrs</span>
+                        {% endif %}
+                        {% if person.gender %}
+                            <span><i class="bi bi-gender-ambiguous"></i>{{ person.get_gender_display }}</span>
+                        {% endif %}
+                        {% if person.last_seen_location %}
+                            <span><i class="bi bi-geo-alt"></i>{{ person.last_seen_location|truncatechars:20 }}</span>
+                        {% endif %}
+                    </div>
+                    {% if person.distinguishing_features %}
+                        <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0;">
+                            {{ person.distinguishing_features|truncatechars:80 }}
+                        </p>
+                    {% endif %}
+                    <div class="result-card-actions">
+                        <a href="{% url 'core:missing_detail' person.pk %}" class="btn btn-outline-primary">
+                            <i class="bi bi-eye me-1"></i>View Details
+                        </a>
+                        <a href="{% url 'core:report_sighting' person.pk %}" class="btn btn-primary">
+                            <i class="bi bi-eye me-1"></i>Report Sighting
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="bi bi-search"></i>
+            </div>
+            <h3>No Results Found</h3>
+            <p>
+                {% if query or gender_val or location_val or age_min_val or age_max_val %}
+                    We couldn't find any missing persons matching your search. Try adjusting your filters or broadening your search terms.
+                {% else %}
+                    Start your search by entering a name, location, or using the filters above.
+                {% endif %}
+            </p>
+            <div class="d-flex gap-2 justify-content-center flex-wrap">
+                {% if query or gender_val or location_val or age_min_val or age_max_val %}
+                    <a href="{% url 'core:search' %}" class="btn btn-primary">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Clear Search
+                    </a>
+                {% endif %}
+                <a href="{% url 'core:report_missing' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-person-plus me-2"></i>Report Missing Person
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function toggleFilters() {
+    const content = document.getElementById('filtersContent');
+    const icon = document.getElementById('filtersIcon');
+    content.classList.toggle('show');
+    icon.classList.toggle('bi-chevron-up');
+    icon.classList.toggle('bi-chevron-down');
+}
+
+// Auto-submit filters on change
+document.getElementById('filterForm')?.addEventListener('change', function() {
+    this.submit();
+});
+</script>
+{% endblock %}

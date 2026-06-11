@@ -1,0 +1,566 @@
+{% extends 'core/base.html' %}
+
+{% block title %}VanishVault – Search. Identify. Reunite.{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Professional Clean Design */
+    .professional-bg {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
+    }
+
+    .hero-section {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: white;
+        position: relative;
+        overflow: hidden;
+        padding: 4rem 0;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        opacity: 0.3;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        letter-spacing: -0.02em;
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+    }
+
+    .hero-description {
+        font-size: 1.1rem;
+        opacity: 0.8;
+        line-height: 1.6;
+        max-width: 600px;
+        margin: 0 auto 2rem;
+    }
+
+    .hero-actions {
+        gap: 1rem;
+    }
+
+    .btn-primary {
+        background: #3b82f6;
+        border: none;
+        border-radius: 8px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+    }
+
+    .btn-primary:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-success {
+        background: #10b981;
+        border: none;
+        border-radius: 8px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-success:hover {
+        background: #059669;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-outline-primary {
+        border: 2px solid #3b82f6;
+        color: #3b82f6;
+        background: transparent;
+        border-radius: 8px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover {
+        background: #3b82f6;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .btn-outline-secondary {
+        border: 2px solid #64748b;
+        color: #64748b;
+        background: transparent;
+        border-radius: 8px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+        background: #64748b;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    /* Statistics Section */
+    .stats-section {
+        background: white;
+        padding: 4rem 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+    }
+
+    .stat-icon.missing {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .stat-icon.found {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+
+    .stat-icon.active {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .stat-icon.resolved {
+        background: #fefce8;
+        color: #ca8a04;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #64748b;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.875rem;
+    }
+
+    /* Sighting Report Section */
+    .sighting-section {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        padding: 4rem 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .sighting-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+    }
+
+    .sighting-icon {
+        width: 48px;
+        height: 48px;
+        background: #10b981;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+    }
+
+    /* Recent Cases Section */
+    .recent-cases {
+        background: white;
+        padding: 4rem 0;
+    }
+
+    .case-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+        height: 100%;
+    }
+
+    .case-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .case-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .case-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .case-meta {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .case-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .case-status.verified {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .case-status.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .case-body {
+        padding: 1.5rem;
+    }
+
+    .case-description {
+        color: #64748b;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+
+    .case-footer {
+        padding: 1rem 1.5rem;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        border-radius: 6px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .hero-actions .btn {
+            width: 100%;
+            max-width: 300px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="professional-bg">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="hero-content text-center">
+                        <h1 class="hero-title">VanishVault</h1>
+                        <p class="hero-subtitle">Search. Identify. Reunite.</p>
+                        <p class="hero-description">
+                            A trusted platform that helps families and authorities find missing persons faster 
+                            through community collaboration and verified reports.
+                        </p>
+                        
+                        <div class="hero-actions d-flex gap-3 justify-content-center flex-wrap">
+                            <a href="{% url 'core:search' %}" class="btn btn-primary">
+                                <i class="bi bi-search me-2"></i>Search Database
+                            </a>
+                            <a href="{% url 'core:report_missing' %}" class="btn btn-outline-primary">
+                                <i class="bi bi-person-x me-2"></i>Report Missing
+                            </a>
+                            <a href="#sighting-report" class="btn btn-success">
+                                <i class="bi bi-eye me-2"></i>Report Sighting
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon missing">
+                            <i class="bi bi-person-x"></i>
+                        </div>
+                        <div class="stat-number">{{ total_missing }}</div>
+                        <div class="stat-label">Active Cases</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon found">
+                            <i class="bi bi-person-check"></i>
+                        </div>
+                        <div class="stat-number">{{ total_found }}</div>
+                        <div class="stat-label">Found Persons</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon active">
+                            <i class="bi bi-eye"></i>
+                        </div>
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Available</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="stat-card">
+                        <div class="stat-icon resolved">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div class="stat-number">Trusted</div>
+                        <div class="stat-label">Platform</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Sighting Report Section -->
+    <section id="sighting-report" class="sighting-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="sighting-card">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="sighting-icon me-3">
+                                        <i class="bi bi-eye"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="h4 mb-1 text-gray-900 fw-bold">Saw Someone Missing?</h3>
+                                        <p class="text-gray-600 mb-0">Report a sighting to help families find their loved ones</p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 mb-3">
+                                    If you've seen someone who matches a missing person's description, 
+                                    your report could be the key to reuniting them with their family. 
+                                    <strong>You can remain anonymous</strong> if you prefer.
+                                </p>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a href="{% url 'core:search' %}" class="btn btn-success">
+                                        <i class="bi bi-search me-2"></i>Search & Report Sighting
+                                    </a>
+                                    <a href="#how-it-works" class="btn btn-outline-secondary">
+                                        <i class="bi bi-info-circle me-2"></i>How It Works
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="sighting-stats">
+                                    <div class="stat-item mb-3">
+                                        <div class="stat-number text-success fw-bold fs-2">24/7</div>
+                                        <div class="stat-label text-gray-600">Available</div>
+                                    </div>
+                                    <div class="stat-item mb-3">
+                                        <div class="stat-number text-success fw-bold fs-2">Anonymous</div>
+                                        <div class="stat-label text-gray-600">Reporting</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number text-success fw-bold fs-2">Fast</div>
+                                        <div class="stat-label text-gray-600">Response</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Cases Section -->
+    <section class="recent-cases">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Missing Persons -->
+                <div class="col-12 col-lg-6">
+                    <div class="case-card">
+                        <div class="case-header">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h3 class="h5 mb-0 fw-bold d-flex align-items-center">
+                                    <span class="stat-icon missing me-2">
+                                        <i class="bi bi-person-x"></i>
+                                    </span>
+                                    <span class="text-gray-900">Recent Missing Persons</span>
+                                </h3>
+                                <a href="{% url 'core:search' %}" class="btn btn-outline-danger btn-sm">
+                                    <span>View All</span>
+                                    <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="case-body">
+                            {% if latest_missing %}
+                                {% for person in latest_missing %}
+                                <div class="case-item mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                                    <div class="case-title">{{ person.full_name }}</div>
+                                    <div class="case-meta">
+                                        <i class="bi bi-geo-alt-fill me-1"></i>{{ person.last_seen_location|default:"Location not specified" }}
+                                    </div>
+                                    <div class="case-meta">
+                                        <i class="bi bi-calendar me-1"></i>{{ person.last_seen_date|date:"M j, Y"|default:"Date unknown" }}
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <span class="case-status {{ person.status }}">{{ person.get_status_display }}</span>
+                                        <a href="{% url 'core:missing_detail' person.pk %}" class="btn btn-outline-primary btn-sm">
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="bi bi-person-x text-gray-400 fs-1 mb-3"></i>
+                                    <p class="text-gray-500 mb-0">No recent missing person cases</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="case-footer text-center">
+                            <a href="{% url 'core:report_missing' %}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-person-plus me-2"></i>Report Missing Person
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Found Persons -->
+                <div class="col-12 col-lg-6">
+                    <div class="case-card">
+                        <div class="case-header">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h3 class="h5 mb-0 fw-bold d-flex align-items-center">
+                                    <span class="stat-icon found me-2">
+                                        <i class="bi bi-person-check"></i>
+                                    </span>
+                                    <span class="text-gray-900">Found Persons</span>
+                                </h3>
+                                <a href="{% url 'core:found_list' %}" class="btn btn-outline-success btn-sm">
+                                    <span>View All</span>
+                                    <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="case-body">
+                            {% if latest_found %}
+                                {% for person in latest_found %}
+                                <div class="case-item mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                                    <div class="case-title">{{ person.possible_name|default:"Unidentified Person" }}</div>
+                                    <div class="case-meta">
+                                        <i class="bi bi-geo-alt-fill me-1"></i>{{ person.found_location }}
+                                    </div>
+                                    <div class="case-meta">
+                                        <i class="bi bi-calendar me-1"></i>{{ person.found_date|date:"M j, Y" }}
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <span class="case-status {{ person.status }}">{{ person.get_status_display }}</span>
+                                        <a href="{% url 'core:found_detail' person.pk %}" class="btn btn-outline-success btn-sm">
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="bi bi-person-check text-gray-400 fs-1 mb-3"></i>
+                                    <p class="text-gray-500 mb-0">No recent found person cases</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="case-footer text-center">
+                            <a href="{% url 'core:report_found' %}" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-person-plus me-2"></i>Report Found Person
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

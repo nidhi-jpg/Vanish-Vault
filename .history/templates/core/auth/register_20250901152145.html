@@ -1,0 +1,343 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Register - VanishVault{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8 col-xl-7">
+        <div class="auth-card">
+            <div class="auth-header text-center mb-4">
+                <div class="auth-logo mb-3">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+                <h3 class="auth-title">Join VanishVault</h3>
+                <p class="auth-subtitle">Help us reunite families and find missing persons</p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="auth-form" id="registerForm">
+                {% csrf_token %}
+                
+                <!-- Step 1: Personal Information -->
+                <div class="form-step active" id="step1">
+                    <h5 class="step-title mb-3">
+                        <span class="step-number">1</span>
+                        Personal Information
+                    </h5>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.first_name.label }}</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="form-text text-danger">{{ form.first_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.last_name.label }}</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="form-text text-danger">{{ form.last_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">{{ form.email.label }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                {{ form.email }}
+                            </div>
+                            {% if form.email.errors %}
+                                <div class="form-text text-danger">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">{{ form.phone_number.label }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                {{ form.phone_number }}
+                            </div>
+                            {% if form.phone_number.errors %}
+                                <div class="form-text text-danger">{{ form.phone_number.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="step-actions mt-4">
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">
+                            Next: Account Details <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Account & Role -->
+                <div class="form-step" id="step2">
+                    <h5 class="step-title mb-3">
+                        <span class="step-number">2</span>
+                        Account & Role
+                    </h5>
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">{{ form.username.label }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                {{ form.username }}
+                            </div>
+                            {% if form.username.errors %}
+                                <div class="form-text text-danger">{{ form.username.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.password1.label }}</label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                                <div class="form-text text-danger">{{ form.password1.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.password2.label }}</label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                                <div class="form-text text-danger">{{ form.password2.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Role Selection -->
+                    <div class="role-selection mt-4">
+                        <label class="form-label mb-3">Select Your Role</label>
+                        <div class="role-chips">
+                            {% for choice in form.role.field.choices %}
+                            <div class="role-chip" data-role="{{ choice.0 }}">
+                                <input type="radio" name="role" value="{{ choice.0 }}" id="role_{{ choice.0 }}" 
+                                       {% if form.role.value == choice.0 %}checked{% endif %}>
+                                <label for="role_{{ choice.0 }}">
+                                    <div class="role-icon">
+                                        {% if choice.0 == 'citizen' %}
+                                            <i class="bi bi-person"></i>
+                                        {% elif choice.0 == 'police' %}
+                                            <i class="bi bi-shield-check"></i>
+                                        {% elif choice.0 == 'ngo' %}
+                                            <i class="bi bi-heart"></i>
+                                        {% elif choice.0 == 'volunteer' %}
+                                            <i class="bi bi-people"></i>
+                                        {% elif choice.0 == 'admin' %}
+                                            <i class="bi bi-gear"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="role-title">{{ choice.1 }}</div>
+                                    <div class="role-description">
+                                        {% if choice.0 == 'citizen' %}
+                                            Report missing persons and search the database
+                                        {% elif choice.0 == 'police' %}
+                                            Verify cases and access full contact details
+                                        {% elif choice.0 == 'ngo' %}
+                                            Report found persons and manage cases
+                                        {% elif choice.0 == 'volunteer' %}
+                                            Assist with search and verification efforts
+                                        {% elif choice.0 == 'admin' %}
+                                            Full system access and user management
+                                        {% endif %}
+                                    </div>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.role.errors %}
+                            <div class="form-text text-danger">{{ form.role.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="step-actions mt-4">
+                        <button type="button" class="btn btn-outline-secondary me-2" onclick="prevStep()">
+                            <i class="bi bi-arrow-left me-2"></i>Back
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">
+                            Next: Organization <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Organization & Verification -->
+                <div class="form-step" id="step3">
+                    <h5 class="step-title mb-3">
+                        <span class="step-number">3</span>
+                        Organization & Verification
+                    </h5>
+                    
+                    <div class="organization-section" id="organizationSection">
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.organization.label }}</label>
+                            {{ form.organization }}
+                            {% if form.organization.errors %}
+                                <div class="form-text text-danger">{{ form.organization.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3" id="idDocumentSection">
+                            <label class="form-label">{{ form.id_document.label }}</label>
+                            {{ form.id_document }}
+                            <div class="form-text">{{ form.id_document.help_text }}</div>
+                            {% if form.id_document.errors %}
+                                <div class="form-text text-danger">{{ form.id_document.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="verification-info alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Verification Process:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li><strong>Citizens:</strong> Immediately active</li>
+                            <li><strong>Volunteers:</strong> Organization verification required</li>
+                            <li><strong>Police/NGO:</strong> ID document review required (1-2 business days)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="step-actions mt-4">
+                        <button type="button" class="btn btn-outline-secondary me-2" onclick="prevStep()">
+                            <i class="bi bi-arrow-left me-2"></i>Back
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">
+                            Review & Submit <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Terms & Submit -->
+                <div class="form-step" id="step4">
+                    <h5 class="step-title mb-3">
+                        <span class="step-number">4</span>
+                        Terms & Conditions
+                    </h5>
+                    
+                    <div class="terms-section">
+                        <div class="form-check mb-3">
+                            {{ form.terms_accepted }}
+                            <label class="form-check-label" for="{{ form.terms_accepted.id_for_label }}">
+                                I agree to the <a href="#" class="auth-link">Terms of Service</a> and 
+                                <a href="#" class="auth-link">Privacy Policy</a>
+                            </label>
+                            {% if form.terms_accepted.errors %}
+                                <div class="form-text text-danger">{{ form.terms_accepted.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="privacy-notice alert alert-warning">
+                            <i class="bi bi-shield-exclamation me-2"></i>
+                            <strong>Privacy Notice:</strong> Your information will be used solely for reuniting missing persons. 
+                            We take data protection seriously and follow strict privacy guidelines.
+                        </div>
+                    </div>
+                    
+                    <div class="step-actions mt-4">
+                        <button type="button" class="btn btn-outline-secondary me-2" onclick="prevStep()">
+                            <i class="bi bi-arrow-left me-2"></i>Back
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-person-plus me-2"></i>Create Account
+                        </button>
+                    </div>
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger mt-3">
+                        {{ form.non_field_errors.0 }}
+                    </div>
+                {% endif %}
+            </form>
+
+            <div class="auth-footer mt-4">
+                <div class="auth-divider">
+                    <span>Already have an account?</span>
+                </div>
+                <div class="text-center">
+                    <a href="{% url 'core:login' %}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentStep = 1;
+const totalSteps = 4;
+
+function showStep(step) {
+    // Hide all steps
+    document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+    // Show current step
+    document.getElementById(`step${step}`).classList.add('active');
+    
+    // Update organization section based on role
+    updateOrganizationSection();
+}
+
+function nextStep() {
+    if (currentStep < totalSteps) {
+        currentStep++;
+        showStep(currentStep);
+    }
+}
+
+function prevStep() {
+    if (currentStep > 1) {
+        currentStep--;
+        showStep(currentStep);
+    }
+}
+
+function updateOrganizationSection() {
+    const selectedRole = document.querySelector('input[name="role"]:checked')?.value;
+    const orgSection = document.getElementById('organizationSection');
+    const idDocSection = document.getElementById('idDocumentSection');
+    
+    if (selectedRole === 'citizen') {
+        orgSection.style.display = 'none';
+    } else {
+        orgSection.style.display = 'block';
+        
+        // Show ID document section only for police and NGO
+        if (selectedRole === 'police' || selectedRole === 'ngo') {
+            idDocSection.style.display = 'block';
+        } else {
+            idDocSection.style.display = 'none';
+        }
+    }
+}
+
+// Role selection handling
+document.querySelectorAll('input[name="role"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        // Update chip selection
+        document.querySelectorAll('.role-chip').forEach(chip => {
+            chip.classList.remove('selected');
+        });
+        this.closest('.role-chip').classList.add('selected');
+        
+        updateOrganizationSection();
+    });
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    updateOrganizationSection();
+    
+    // Select initial role chip if value is set
+    const checkedRole = document.querySelector('input[name="role"]:checked');
+    if (checkedRole) {
+        checkedRole.closest('.role-chip').classList.add('selected');
+    }
+});
+</script>
+{% endblock %}

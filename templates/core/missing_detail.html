@@ -1,0 +1,497 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ person.full_name }} - Missing Person Details{% endblock %}
+
+{% block extra_head %}
+<style>
+.case-header { margin-bottom: 1.25rem; }
+.case-title { font-size: 1.75rem; font-weight: 800; margin: 0; letter-spacing: -0.015em; }
+.case-meta-info .badge { background: transparent; color: var(--text-muted); border: 1px solid rgba(255,255,255,0.10); border-radius: 999px; padding: .15rem .5rem; font-weight: 600; }
+.case-actions-header .btn { box-shadow: none !important; }
+
+.quick-info-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1rem; }
+.quick-info-list { display: grid; gap: .5rem; }
+.quick-info-list .info-item { display:flex; align-items:center; gap:.5rem; color: var(--text-muted); }
+
+.case-photo-section .photo-container { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); background: #0f1319; }
+.case-photo-large { width: 100%; height: auto; display:block; }
+.photo-overlay { position:absolute; inset:auto 0 .75rem 0; display:flex; justify-content:center; opacity:0; transition: opacity .2s ease; }
+.case-photo-section .photo-container:hover .photo-overlay { opacity: 1; }
+
+.nav-tabs.case-tabs { border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: .75rem; }
+.nav-tabs.case-tabs .nav-link { border: none; color: var(--text-muted); background: transparent; }
+.nav-tabs.case-tabs .nav-link.active { color: var(--text-primary); border-bottom: 2px solid var(--primary); border-radius: 0; }
+
+.tab-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1rem; }
+.tab-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: .75rem; }
+.detail-grid { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:.75rem .75rem; }
+.detail-item .detail-label { color: var(--text-muted); font-size: .85rem; }
+.detail-item .detail-value { color: var(--text-primary); font-weight: 600; }
+
+@media (max-width: 767.98px) { .detail-grid { grid-template-columns: 1fr; } .case-title { font-size: 1.5rem; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-xxl my-5">
+    
+    <!-- Case Header -->
+    <div class="case-header mb-4">
+        <div class="row align-items-center reveal-stagger">
+            <div class="col-12 col-md-8">
+                <div class="case-title-section">
+                    <div class="eyebrow">Missing Person</div>
+                    <h1 class="case-title headline">{{ person.full_name }}</h1>
+                    <div class="case-meta-info">
+                        <span class="badge bg-{% if person.status == 'verified' %}success{% elif person.status == 'pending' %}warning{% else %}secondary{% endif %} me-2">
+                            {{ person.get_status_display }}
+                        </span>
+                        {% if person.case_id %}
+                            <span class="badge bg-secondary me-2">{{ person.case_id }}</span>
+                        {% endif %}
+                        {% if person.days_missing %}
+                            <span class="badge bg-danger">{{ person.days_missing }} days missing</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4 text-md-end">
+                <div class="case-actions-header">
+                    <button class="btn btn-outline-primary btn-sm me-2" onclick="shareCase()">
+                        <i class="bi bi-share me-1"></i>Share
+                    </button>
+                    <a href="{% url 'core:search' %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i>Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Case Content -->
+    <div class="row">
+        <div class="col-12 col-lg-4">
+            <!-- Photo Section -->
+            <div class="case-photo-section mb-4">
+                <div class="photo-container">
+                    {% if person.photo %}
+                        <img src="{{ person.photo.url }}" class="case-photo-large" alt="{{ person.full_name }}">
+                    {% else %}
+                        <div class="photo-placeholder-large">
+                            <i class="bi bi-person"></i>
+                        </div>
+                    {% endif %}
+                    <div class="photo-overlay">
+                        <button class="btn btn-light btn-sm" onclick="viewFullPhoto()">
+                            <i class="bi bi-zoom-in me-1"></i>View Full Size
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Info Card -->
+            <div class="quick-info-card">
+                <h6 class="card-title">
+                    <i class="bi bi-info-circle me-2"></i>Quick Information
+                </h6>
+                <div class="quick-info-list reveal-stagger">
+                    <div class="info-item">
+                        <i class="bi bi-calendar text-primary"></i>
+                        <span><strong>Age:</strong> {{ person.age }} years</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-person text-primary"></i>
+                        <span><strong>Gender:</strong> {{ person.get_gender_display }}</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-geo-alt text-primary"></i>
+                        <span><strong>Last Seen:</strong> {{ person.last_seen_location }}</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-clock text-primary"></i>
+                        <span><strong>Date:</strong> {{ person.last_seen_date|date:"M j, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+    </div>
+    
+    <div class="col-12 col-lg-8">
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs case-tabs" id="caseTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab">
+                    <i class="bi bi-person me-2"></i>Details
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="physical-tab" data-bs-toggle="tab" data-bs-target="#physical" type="button" role="tab">
+                    <i class="bi bi-rulers me-2"></i>Physical
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="sightings-tab" data-bs-toggle="tab" data-bs-target="#sightings" type="button" role="tab">
+                    <i class="bi bi-eye me-2"></i>Sightings
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab">
+                    <i class="bi bi-telephone me-2"></i>Contact
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content case-tab-content" id="caseTabContent">
+            <!-- Details Tab -->
+            <div class="tab-pane fade show active" id="details" role="tabpanel">
+                <div class="tab-card section-spotlight">
+                    <h5 class="tab-title">
+                        <i class="bi bi-info-circle me-2"></i>Case Details
+                    </h5>
+                    
+                    <div class="detail-grid reveal-stagger">
+                        <div class="detail-item">
+                            <div class="detail-label">Full Name</div>
+                            <div class="detail-value">{{ person.full_name }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Case ID</div>
+                            <div class="detail-value">{{ person.case_id|default:"Not assigned" }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Status</div>
+                            <div class="detail-value">
+                                <span class="badge bg-{% if person.status == 'verified' %}success{% elif person.status == 'pending' %}warning{% else %}secondary{% endif %}">
+                                    {{ person.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Reported On</div>
+                            <div class="detail-value">{{ person.created_at|date:"F j, Y g:i A" }}</div>
+                        </div>
+                    </div>
+
+                    {% if person.description %}
+                    <div class="description-section">
+                        <h6>Additional Information</h6>
+                        <p class="description-text">{{ person.description }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Physical Tab -->
+            <div class="tab-pane fade" id="physical" role="tabpanel">
+                <div class="tab-card section-spotlight">
+                    <h5 class="tab-title">
+                        <i class="bi bi-rulers me-2"></i>Physical Description
+                    </h5>
+                    
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Age</div>
+                            <div class="detail-value">{{ person.age }} years old</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Gender</div>
+                            <div class="detail-value">{{ person.get_gender_display }}</div>
+                        </div>
+                        {% if person.height %}
+                        <div class="detail-item">
+                            <div class="detail-label">Height</div>
+                            <div class="detail-value">{{ person.height }}</div>
+                        </div>
+                        {% endif %}
+                        {% if person.weight %}
+                        <div class="detail-item">
+                            <div class="detail-label">Weight</div>
+                            <div class="detail-value">{{ person.weight }}</div>
+                        </div>
+                        {% endif %}
+                        {% if person.hair_color %}
+                        <div class="detail-item">
+                            <div class="detail-label">Hair Color</div>
+                            <div class="detail-value">{{ person.hair_color }}</div>
+                        </div>
+                        {% endif %}
+                        {% if person.eye_color %}
+                        <div class="detail-item">
+                            <div class="detail-label">Eye Color</div>
+                            <div class="detail-value">{{ person.eye_color }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% if person.distinguishing_features %}
+                    <div class="features-section">
+                        <h6>Distinguishing Features</h6>
+                        <p class="features-text">{{ person.distinguishing_features }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Sightings Tab -->
+            <div class="tab-pane fade" id="sightings" role="tabpanel">
+                <div class="tab-card section-spotlight">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="tab-title mb-0">
+                            <i class="bi bi-eye me-2"></i>Reported Sightings
+                        </h5>
+                        <a href="{% url 'core:report_sighting' person.pk %}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-plus me-1"></i>Report Sighting
+                        </a>
+                    </div>
+
+                    <div class="sightings-list">
+                        <!-- Placeholder for sightings - would be populated from database -->
+                        <div class="sighting-item">
+                            <div class="sighting-header">
+                                <div class="sighting-location">
+                                    <i class="bi bi-geo-alt me-1"></i>Downtown Mall
+                                </div>
+                                <div class="sighting-date">March 15, 2024</div>
+                            </div>
+                            <div class="sighting-details">
+                                <p>Reported by anonymous tipster. Person was seen near the food court around 2 PM.</p>
+                            </div>
+                            <div class="sighting-status">
+                                <span class="badge bg-warning">Under Review</span>
+                            </div>
+                        </div>
+
+                        <div class="no-sightings" style="display: none;">
+                            <div class="empty-state-small">
+                                <i class="bi bi-eye-slash"></i>
+                                <p>No sightings reported yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Tab -->
+            <div class="tab-pane fade" id="contact" role="tabpanel">
+                <div class="tab-card section-spotlight">
+                    <h5 class="tab-title">
+                        <i class="bi bi-telephone me-2"></i>Contact Information
+                    </h5>
+                    
+                    {% if user.is_authenticated and user.can_verify_cases %}
+                        <!-- Full contact info for police/admin -->
+                        <div class="contact-info-full">
+                            <div class="contact-item">
+                                <div class="contact-label">Reporter</div>
+                                <div class="contact-value">
+                                    {% if person.reporter %}
+                                        {{ person.reporter.get_full_name|default:person.reporter.username }}
+                                    {% else %}
+                                        Unknown Reporter
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <div class="contact-label">Relationship</div>
+                                <div class="contact-value">{{ person.reporter_relationship }}</div>
+                            </div>
+                            <div class="contact-item">
+                                <div class="contact-label">Phone</div>
+                                <div class="contact-value">
+                                    <a href="tel:{{ person.reporter_phone }}" class="contact-link">
+                                        <i class="bi bi-telephone me-1"></i>{{ person.reporter_phone }}
+                                    </a>
+                                </div>
+                            </div>
+                            {% if person.reporter and person.reporter.email %}
+                            <div class="contact-item">
+                                <div class="contact-label">Email</div>
+                                <div class="contact-value">
+                                    <a href="mailto:{{ person.reporter.email }}" class="contact-link">
+                                        <i class="bi bi-envelope me-1"></i>{{ person.reporter.email }}
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <!-- Masked contact info for general users -->
+                        <div class="contact-info-masked">
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <strong>Contact Information Protected</strong><br>
+                                Full contact details are only available to verified law enforcement and authorized personnel.
+                            </div>
+                            
+                            <div class="contact-actions">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contactModal">
+                                    <i class="bi bi-telephone me-2"></i>Request Contact Information
+                                </button>
+                                <p class="contact-note">
+                                    Your request will be reviewed and forwarded to the case reporter if approved.
+                                </p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Warning for unverified cases -->
+{% if not person.status == 'verified' %}
+<div class="alert alert-warning mt-4">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    <strong>Unverified Case:</strong> This case has not been verified by law enforcement. Please contact local authorities if you have information.
+</div>
+{% endif %}
+
+<!-- Sighting Report Modal -->
+<div class="modal fade" id="sightingModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-eye me-2"></i>Report a Sighting
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'core:report_sighting' person.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-info mb-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Important:</strong> Your report will be shared with law enforcement and the family. 
+                        You can remain anonymous if you prefer.
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label required">📍 Location of Sighting</label>
+                            <input type="text" name="location" class="form-control" placeholder="Exact address, landmark, or area where you saw this person" required>
+                            <div class="form-text">Be as specific as possible (street address, building name, etc.)</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label required">📅 Date</label>
+                            <input type="date" name="date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">🕐 Time</label>
+                            <input type="time" name="time" class="form-control">
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label required">📝 Description</label>
+                            <textarea name="description" class="form-control" rows="4" placeholder="Please provide as much detail as possible about what you observed..." required></textarea>
+                            <div class="form-text">Include details like: what they were wearing, who they were with, what they were doing, their condition, etc.</div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="form-label">🎯 How confident are you?</label>
+                            <select name="confidence_level" class="form-select">
+                                <option value="high">High - I'm certain it was them</option>
+                                <option value="medium" selected>Medium - I think it was them</option>
+                                <option value="low">Low - I'm not sure</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-12">
+                            <hr class="my-3">
+                            <h6 class="text-muted">Contact Information (Optional)</h6>
+                            <p class="small text-muted">Providing your contact info helps authorities follow up if needed, but you can remain anonymous.</p>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">👤 Your Name</label>
+                            <input type="text" name="reporter_name" class="form-control" placeholder="Leave blank to remain anonymous">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">📞 Your Phone</label>
+                            <input type="tel" name="reporter_phone" class="form-control" placeholder="For follow-up questions">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">📧 Your Email</label>
+                            <input type="email" name="reporter_email" class="form-control" placeholder="Optional - for updates">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send me-2"></i>Submit Sighting Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Request Modal -->
+<div class="modal fade" id="contactModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-telephone me-2"></i>Request Contact Information
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'core:request_contact' person.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Please provide your information so we can verify your request and connect you with the case reporter.
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Your Name</label>
+                            <input type="text" name="requester_name" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Your Phone</label>
+                            <input type="tel" name="requester_phone" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Your Email</label>
+                            <input type="email" name="requester_email" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Reason for Contact</label>
+                            <textarea name="reason" class="form-control" rows="3" placeholder="Why do you need to contact the reporter?" required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send me-2"></i>Submit Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function shareCase() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Missing Person: {{ person.full_name }}',
+            text: 'Help find {{ person.full_name }}, last seen {{ person.last_seen_location }} on {{ person.last_seen_date|date:"F j, Y" }}',
+            url: window.location.href
+        });
+    } else {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Case URL copied to clipboard!');
+    }
+}
+
+function viewFullPhoto() {
+    // In a real app, this would open a lightbox or full-screen photo viewer
+    alert('Full photo viewer would open here');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Found Persons - VanishVault{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-section mb-4">
+    <div class="page-header-bar">
+        <div>
+            <h2 class="page-header-title"><i class="bi bi-people me-2"></i>Found Persons</h2>
+            <p class="page-subtext">Unidentified persons found by organizations and community members</p>
+        </div>
+        <a href="{% if user.is_authenticated %}{% url 'core:report_found' %}{% else %}{% url 'core:login' %}{% endif %}" class="btn btn-primary btn-pill">
+            <i class="bi bi-plus-circle me-2"></i>Report a Found Person
+        </a>
+    </div>
+ </div>
+
+<!-- Filter Card -->
+<div class="filter-card mb-4">
+    <form method="get" class="p-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-4">
+                <label class="form-label">Gender</label>
+                <select class="form-select" name="gender">
+                    <option value="">Any Gender</option>
+                    <option value="male" {% if request.GET.gender == 'male' %}selected{% endif %}>Male</option>
+                    <option value="female" {% if request.GET.gender == 'female' %}selected{% endif %}>Female</option>
+                    <option value="other" {% if request.GET.gender == 'other' %}selected{% endif %}>Other</option>
+                    <option value="unknown" {% if request.GET.gender == 'unknown' %}selected{% endif %}>Unknown</option>
+                </select>
+            </div>
+            
+            <div class="col-12 col-md-3">
+                <label class="form-label">Age Range</label>
+                <div class="input-group">
+                    <input type="number" class="form-control" name="age_min" placeholder="Min" min="0" max="120">
+                    <span class="input-group-text">-</span>
+                    <input type="number" class="form-control" name="age_max" placeholder="Max" min="0" max="120">
+                </div>
+            </div>
+            
+            <div class="col-12 col-md-3">
+                <label class="form-label">Found Date</label>
+                <input type="date" class="form-control" name="found_date">
+            </div>
+            
+            <div class="col-12 col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-funnel me-2"></i>Filter
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Found Persons Grid -->
+<div class="results-section">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 class="mb-0">Unidentified Persons</h4>
+        <small class="text-muted">{{ items.count }} case{{ items.count|pluralize }} found</small>
+    </div>
+    
+    <div class="row g-4">
+        {% for person in items %}
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="case-card h-100">
+                {% if person.photo %}
+                    <img src="{{ person.photo.url }}" class="case-photo" alt="{{ person.possible_name }}">
+                {% else %}
+                    <div class="case-photo-placeholder">
+                        <i class="bi bi-person"></i>
+                    </div>
+                {% endif %}
+                
+                <div class="case-info">
+                    <div class="case-name">
+                        {{ person.possible_name|default:"Unidentified" }}
+                    </div>
+                    <div class="case-location">{{ person.found_location }}</div>
+                    
+                    <div class="case-meta mb-3">
+                        {% if person.estimated_age %}{{ person.estimated_age }} years{% endif %}
+                        {% if person.gender %} • {{ person.get_gender_display }}{% endif %}
+                        {% if person.found_date %}
+                            <br><small class="text-muted">Found {{ person.found_date|timesince }} ago</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="case-badges mb-3">
+                        <span class="badge bg-warning">{{ person.get_status_display }}</span>
+                        {% if person.case_id %}
+                            <span class="badge bg-secondary">{{ person.case_id }}</span>
+                        {% endif %}
+                        {% if person.found_by_organization %}
+                            <span class="badge bg-info">{{ person.found_by_organization }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="case-actions d-flex gap-2">
+                        <a href="{% url 'core:found_detail' person.pk %}" class="btn btn-outline-primary btn-sm flex-fill">
+                            <i class="bi bi-eye me-2"></i>View Details
+                        </a>
+                        <button class="btn btn-outline-success btn-sm" title="Check for matches">
+                            <i class="bi bi-search-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <h5 class="mb-2">No unidentified persons yet</h5>
+                <p class="empty-text mb-3">
+                    New found person reports will appear here as soon as they are submitted by organizations.
+                </p>
+                <a href="#" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Report a Found Person
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Information Section -->
+<div class="info-section mt-5">
+    <div class="row g-4">
+        <div class="col-12 col-lg-6">
+            <div class="info-card">
+                <h5 class="info-title">
+                    <i class="bi bi-info-circle me-2"></i>About Found Persons
+                </h5>
+                <p class="info-text">
+                    These are individuals who have been found but cannot be identified. 
+                    They may be in hospitals, shelters, or other facilities.
+                </p>
+                <ul class="info-list">
+                    <li>All information is verified by reporting organizations</li>
+                    <li>Photos and details help with identification</li>
+                    <li>Contact the reporting organization for more information</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="col-12 col-lg-6">
+            <div class="info-card">
+                <h5 class="info-title">
+                    <i class="bi bi-shield-check me-2"></i>Privacy & Safety
+                </h5>
+                <p class="info-text">
+                    We maintain strict privacy standards while helping reunite families.
+                </p>
+                <ul class="info-list">
+                    <li>Personal details are protected until verified</li>
+                    <li>Only authorized organizations can report found persons</li>
+                    <li>All reports are reviewed for accuracy</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

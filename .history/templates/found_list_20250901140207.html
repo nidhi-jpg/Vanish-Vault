@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-2">
+  <h4 class="mb-0">Unidentified / Found Persons</h4>
+  <a href="/search/" class="btn btn-outline-primary btn-sm"><i class="bi bi-search me-1"></i> Search Missing</a>
+</div>
+
+<form class="filter-card p-3 mb-3" method="get">
+  <div class="row g-2 align-items-end">
+    <div class="col-12 col-md-4">
+      <label class="form-label small text-muted">Gender</label>
+      <select class="form-select" name="gender">
+        <option value="">Any Gender</option>
+        <option value="male" {% if request.GET.gender == 'male' %}selected{% endif %}>Male</option>
+        <option value="female" {% if request.GET.gender == 'female' %}selected{% endif %}>Female</option>
+        <option value="other" {% if request.GET.gender == 'other' %}selected{% endif %}>Other</option>
+      </select>
+    </div>
+    <div class="col-12 col-md-2 ms-auto">
+      <button class="btn btn-gradient w-100" type="submit"><i class="bi bi-funnel me-1"></i> Filter</button>
+    </div>
+  </div>
+</form>
+
+<div class="row g-3">
+  {% for p in items %}
+  <div class="col-6 col-md-4 col-lg-3 reveal">
+    <div class="card h-100 result-card">
+      {% if p.photo %}<img src="{{ p.photo.url }}" class="card-img-top" alt="{{ p.possible_name }}">{% endif %}
+      <div class="card-body p-2">
+        <div class="card-title fw-semibold mb-1">{{ p.possible_name|default:'Unidentified' }}</div>
+        <div class="meta mb-2">
+          {% if p.estimated_age %}<span class="pill"><i class="bi bi-person me-1"></i>{{ p.estimated_age }}</span>{% endif %}
+          {% if p.found_location %}<span class="pill"><i class="bi bi-geo-alt me-1"></i>{{ p.found_location }}</span>{% endif %}
+        </div>
+        <a href="{% url 'found_detail' p.id %}" class="btn btn-outline-primary btn-sm w-100">View Details</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="empty-state">
+      <div class="icon mb-2"><i class="bi bi-people"></i></div>
+      <h6 class="mb-1">No entries yet</h6>
+      <p>New sightings will appear here as soon as they are reported.</p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4 class="mb-3">Search Missing Persons</h4>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-12 col-md-6">
+    <input class="form-control" type="text" name="q" value="{{ query }}" placeholder="Name or location">
+  </div>
+  <div class="col-12 col-md-3">
+    <select class="form-select" name="gender">
+      <option value="">Any Gender</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+      <option value="other">Other</option>
+    </select>
+  </div>
+  <div class="col-12 col-md-3">
+    <button class="btn btn-primary w-100" type="submit">Search</button>
+  </div>
+  </form>
+
+<div class="row g-3">
+  {% for p in results %}
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="card h-100">
+      {% if p.photo %}<img src="{{ p.photo.url }}" class="card-img-top" alt="{{ p.full_name }}">{% endif %}
+      <div class="card-body p-2">
+        <div class="fw-semibold">{{ p.full_name }}</div>
+        <div class="text-muted small">{{ p.last_seen_location }}</div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="text-muted">No results found.</div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+

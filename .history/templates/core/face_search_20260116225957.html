@@ -1,0 +1,1286 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Face Search - VanishVault{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Face Search Page Enhancements - Dark Theme */
+:root {
+    --primary-color: #00ADB5;
+    --primary-dark: #008B91;
+    --accent-color: #FF6B35;
+    --accent-dark: #E55A2B;
+    --bg-base: #0B0F14;
+    --bg-card: #111827;
+    --text-primary: #F5F7FA;
+    --text-muted: #9AA4B2;
+    --border-color: rgba(255, 255, 255, 0.08);
+    
+    --primary-glow: rgba(0, 173, 181, 0.3);
+    --accent-glow: rgba(255, 107, 53, 0.3);
+    --success-glow: rgba(34, 197, 94, 0.3);
+    --danger-glow: rgba(239, 68, 68, 0.3);
+    --warning-glow: rgba(251, 191, 36, 0.3);
+}
+
+/* Page Header Styling */
+.face-search-header {
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(13, 202, 240, 0.05) 100%);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(13, 110, 253, 0.1);
+    animation: slideDown 0.6s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.face-search-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+
+.face-search-subtitle {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+.face-search-actions .btn {
+    transition: all 0.3s ease;
+}
+
+.face-search-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Card Styling */
+.face-search-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 173, 181, 0.1);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.face-search-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 173, 181, 0.3);
+    transform: translateY(-2px);
+}
+
+.face-search-card .card-header {
+    background: linear-gradient(135deg, rgba(0, 173, 181, 0.15) 0%, rgba(0, 173, 181, 0.05) 100%);
+    color: var(--text-primary);
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(0, 173, 181, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.face-search-card .card-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+    opacity: 0.3;
+}
+
+.face-search-card .card-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.face-search-card .card-body {
+    padding: 1.5rem;
+}
+
+/* Upload Area Styling */
+.upload-area {
+    border: 2px dashed var(--border-color);
+    border-radius: 0.75rem;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    background: rgba(0, 173, 181, 0.03);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.upload-area::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 0.75rem;
+    padding: 2px;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.upload-area:hover {
+    border-color: var(--primary-color);
+    background: rgba(0, 173, 181, 0.08);
+    box-shadow: 0 0 20px rgba(0, 173, 181, 0.2);
+}
+
+.upload-area:hover::before {
+    opacity: 0.5;
+}
+
+.upload-area.drag-over {
+    border-color: #22C55E;
+    background: rgba(34, 197, 94, 0.08);
+    border-style: solid;
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.3);
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    opacity: 0.8;
+    filter: drop-shadow(0 0 8px rgba(0, 173, 181, 0.3));
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover .upload-icon {
+    opacity: 1;
+    filter: drop-shadow(0 0 12px rgba(0, 173, 181, 0.5));
+    transform: scale(1.05);
+}
+
+.upload-subtitle {
+    color: var(--text-muted);
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
+
+/* Photo Preview Styling */
+.preview-container {
+    position: relative;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 173, 181, 0.2);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.preview-container:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 173, 181, 0.4);
+}
+
+.preview-img {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: contain;
+    background: var(--bg-base);
+    display: block;
+}
+
+.preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.preview-container:hover .preview-overlay {
+    opacity: 1;
+}
+
+.preview-info {
+    background: linear-gradient(135deg, rgba(0, 173, 181, 0.1) 0%, rgba(0, 173, 181, 0.05) 100%);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(0, 173, 181, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 173, 181, 0.1);
+}
+
+.preview-filename {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+}
+
+.preview-size {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Search Options Styling */
+.search-options {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    border: none;
+}
+
+.options-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.search-options .form-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.search-options .form-select {
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.search-options .form-select:focus {
+    background: var(--bg-card);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 2px rgba(0, 173, 181, 0.2);
+}
+
+/* Search Button Styling */
+.search-actions .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    border: none;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    color: var(--text-primary);
+    box-shadow: 0 4px 12px rgba(0, 173, 181, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.search-actions .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.search-actions .btn-primary:hover:not(:disabled)::before {
+    width: 300px;
+    height: 300px;
+}
+
+.search-actions .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 173, 181, 0.4);
+}
+
+.search-actions .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Loading State Styling */
+.search-loading {
+    text-align: center;
+    padding: 3rem 2rem;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.loading-content .spinner-border {
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 1.5rem;
+}
+
+.loading-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.loading-text {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+.loading-progress {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.loading-progress .progress {
+    height: 8px;
+    border-radius: 1rem;
+    margin-bottom: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.loading-progress .progress-bar {
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    border-radius: 1rem;
+}
+
+/* Empty Results Styling */
+.empty-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted);
+}
+
+.empty-results i {
+    font-size: 3rem;
+    opacity: 0.3;
+    margin-bottom: 1rem;
+    display: block;
+    color: var(--text-muted);
+}
+
+.empty-results h6 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.empty-results p {
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Match Result Item Styling */
+.match-result-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(0, 173, 181, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.match-result-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--primary-color), var(--accent-color));
+    border-radius: 0.5rem 0 0 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.match-result-item:hover {
+    background: rgba(0, 173, 181, 0.08);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(0, 173, 181, 0.2);
+    transform: translateX(4px);
+}
+
+.match-result-item:hover::before {
+    opacity: 1;
+}
+
+.match-photo {
+    flex-shrink: 0;
+    position: relative;
+}
+
+.match-thumbnail {
+    width: 80px;
+    height: 80px;
+    border-radius: 0.5rem;
+    object-fit: cover;
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.match-result-item:hover .match-thumbnail {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(0, 173, 181, 0.3);
+    transform: scale(1.05);
+}
+
+.match-content {
+    flex: 1;
+}
+
+.match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.match-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.match-header .badge {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.75rem;
+    font-weight: 600;
+}
+
+.match-details p {
+    margin-bottom: 0.4rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.match-details strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.match-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.match-actions .btn {
+    white-space: nowrap;
+    font-size: 0.875rem;
+}
+
+/* Badge Colors */
+.badge.bg-success {
+    background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%) !important;
+    box-shadow: 0 2px 8px var(--success-glow), 0 0 12px rgba(34, 197, 94, 0.2);
+    color: var(--text-primary) !important;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.badge.bg-warning {
+    background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%) !important;
+    box-shadow: 0 2px 8px var(--warning-glow), 0 0 12px rgba(251, 191, 36, 0.2);
+    color: #0B0F14 !important;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.badge.bg-danger {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
+    box-shadow: 0 2px 8px var(--danger-glow), 0 0 12px rgba(239, 68, 68, 0.2);
+    color: var(--text-primary) !important;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge.bg-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%) !important;
+    box-shadow: 0 2px 8px var(--primary-glow), 0 0 12px rgba(0, 173, 181, 0.2);
+    color: var(--text-primary) !important;
+    border: 1px solid rgba(0, 173, 181, 0.3);
+}
+
+.badge.bg-info {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%) !important;
+    box-shadow: 0 2px 8px var(--accent-glow), 0 0 12px rgba(255, 107, 53, 0.2);
+    color: var(--text-primary) !important;
+    border: 1px solid rgba(255, 107, 53, 0.3);
+}
+
+.badge.bg-secondary {
+    background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%) !important;
+    color: var(--text-muted) !important;
+    border: 1px solid rgba(107, 114, 128, 0.3);
+}
+
+/* Modal Styling */
+.modal-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 173, 181, 0.2);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: var(--text-primary);
+    border-bottom: 1px solid rgba(0, 173, 181, 0.3);
+    border-radius: 1rem 1rem 0 0;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 173, 181, 0.2);
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.modal-body {
+    padding: 2rem;
+    background: var(--bg-card);
+}
+
+.modal-footer {
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+    padding: 1.5rem;
+}
+
+/* Comparison Photos */
+.comparison-photo {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.comparison-photo h6 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.comparison-img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 0.75rem;
+    border: 3px solid var(--border-color);
+    background: var(--bg-base);
+}
+
+/* Match Analysis */
+.match-analysis h6 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.analysis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.analysis-item {
+    background: rgba(0, 173, 181, 0.1);
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.analysis-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 173, 181, 0.2);
+    border-color: var(--primary-color);
+    background: rgba(0, 173, 181, 0.15);
+}
+
+.analysis-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.analysis-value .badge {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+}
+
+/* History Item Styling */
+.history-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.history-item:hover {
+    background: rgba(0, 173, 181, 0.1);
+    border-color: var(--primary-color);
+    transform: translateX(4px);
+}
+
+.history-thumbnail {
+    width: 60px;
+    height: 60px;
+    border-radius: 0.5rem;
+    object-fit: cover;
+}
+
+.history-content {
+    flex: 1;
+}
+
+.history-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.history-details {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .face-search-title {
+        font-size: 2rem;
+    }
+    
+    .face-search-header {
+        padding: 1.5rem;
+    }
+    
+    .upload-area {
+        padding: 2rem 1rem;
+    }
+    
+    .upload-icon {
+        font-size: 3rem;
+    }
+    
+    .match-result-item {
+        flex-direction: column;
+    }
+    
+    .match-actions {
+        flex-direction: row;
+    }
+    
+    .analysis-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Button Ripple Effect */
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::after {
+    width: 200px;
+    height: 200px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<!-- Page Header -->
+<div class="page-section mb-4">
+    <div class="page-header-bar">
+        <div>
+            <h1 class="page-header-title">
+                <i class="bi bi-camera-fill me-2"></i>Search by Photo
+            </h1>
+            <p class="page-subtext">Our AI system can match photos, sketches, or pixelated images with faces in our database</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-soft btn-pill" onclick="viewSearchHistory()">
+                <i class="bi bi-clock-history me-2"></i>Search History
+            </button>
+            <a href="{% url 'core:search' %}" class="btn btn-outline-primary btn-pill ms-2">
+                <i class="bi bi-search me-2"></i>Text Search
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Instructions -->
+<div class="alert alert-info border-0 mb-4" style="background: rgba(0, 173, 181, 0.1); border-left: 3px solid var(--primary-color) !important;">
+    <div class="d-flex align-items-start">
+        <i class="bi bi-info-circle me-2" style="color: var(--primary-color);"></i>
+        <div>
+            <strong>How it works:</strong> Upload any image — a photo, sketch, or even a pixelated image. Our AI system will analyze it and search for matching faces in our database. The more details visible, the better the results.
+        </div>
+    </div>
+</div>
+
+<!-- Face Search Content -->
+<div class="row g-4">
+    <div class="col-12 col-lg-6">
+        <!-- Upload Section Card -->
+        <div class="face-search-card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-upload me-2"></i>Upload Image
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-content">
+                        <i class="bi bi-image upload-icon"></i>
+                        <p class="upload-subtitle mb-2" style="font-weight: 500; color: rgba(255,255,255,0.8);">Upload a photo, sketch, or image</p>
+                        <p class="upload-subtitle mb-3" style="font-size: 0.85rem;">Our AI can work with photos, sketches, or pixelated images</p>
+                        <input type="file" id="photoInput" accept="image/*" style="display: none;">
+                        <button class="btn btn-primary" type="button" onclick="document.getElementById('photoInput').click()">
+                            <i class="bi bi-upload me-2"></i>Choose Image
+                        </button>
+                        <div class="mt-3">
+                            <small class="text-muted">Supported: JPG, PNG (Max 5MB) • Works with photos, sketches, and pixelated images</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Photo Preview -->
+                <div class="photo-preview" id="photoPreview" style="display: none;">
+                    <div class="preview-container">
+                        <img id="previewImage" class="preview-img" alt="Uploaded photo">
+                        <div class="preview-overlay">
+                            <button class="btn btn-light btn-sm" onclick="removePhoto()">
+                                <i class="bi bi-x me-1"></i>Remove
+                            </button>
+                        </div>
+                    </div>
+                    <div class="preview-info">
+                        <h6 class="preview-filename" id="previewFilename"></h6>
+                        <p class="preview-size" id="previewSize"></p>
+                    </div>
+                </div>
+                
+                <!-- Search Options -->
+                <div class="search-options mt-4">
+                    <h6 class="options-title mb-3">
+                        <i class="bi bi-sliders me-2"></i>Search Settings
+                    </h6>
+                    <div class="mb-3">
+                        <label class="form-label">Search In</label>
+                        <select class="form-select" id="searchType">
+                            <option value="both" selected>Both Missing & Found Persons</option>
+                            <option value="missing">Missing Persons Only</option>
+                            <option value="found">Found Persons Only</option>
+                        </select>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label">Match Sensitivity</label>
+                        <select class="form-select" id="confidenceThreshold">
+                            <option value="0.6" selected>Medium - Recommended</option>
+                            <option value="0.8">High - More Strict</option>
+                            <option value="0.4">Low - More Results</option>
+                        </select>
+                        <small class="text-muted d-block mt-1">Lower sensitivity shows more potential matches</small>
+                    </div>
+                </div>
+                
+                <!-- Search Button -->
+                <div class="search-actions mt-4">
+                    <button class="btn btn-primary btn-lg w-100" id="searchButton" onclick="startFaceSearch()" disabled>
+                        <i class="bi bi-search me-2"></i>Search Database
+                    </button>
+                    <p class="text-muted small text-center mt-2 mb-0">
+                        <i class="bi bi-shield-check me-1"></i>Your image is processed securely and not stored
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-lg-6">
+        <!-- Search Results Card -->
+        <div class="face-search-card" style="min-height: 600px;">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-list-ul me-2"></i>Results
+                </h5>
+                <span class="badge bg-secondary" id="resultsCount">0 matches</span>
+            </div>
+            <div class="card-body" style="max-height: 550px; overflow-y: auto;">
+                <!-- Loading State -->
+                <div class="search-loading" id="searchLoading" style="display: none;">
+                    <div class="loading-content">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <h6 class="loading-title">Analyzing Image...</h6>
+                        <p class="loading-text">Our AI is detecting faces and searching the database for matches</p>
+                        <div class="loading-progress">
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" id="progressBar"></div>
+                            </div>
+                            <small class="text-muted" id="progressText">Initializing...</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Results List -->
+                <div class="search-results" id="searchResults">
+                    <div class="empty-results">
+                        <i class="bi bi-search"></i>
+                        <h6>Ready to Search</h6>
+                        <p class="mb-0">Upload an image above and click "Search Database" to find potential matches</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search History Modal -->
+<div class="modal fade" id="searchHistoryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-clock-history me-2"></i>Search History
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="search-history-list">
+                    <div class="history-item">
+                        <div class="history-photo">
+                            <img src="/static/images/placeholder.svg" alt="Search photo" class="history-thumbnail">
+                        </div>
+                        <div class="history-content">
+                            <div class="history-title">Face Search #1</div>
+                            <div class="history-details">
+                                <span class="badge bg-success">3 matches found</span>
+                                <span class="text-muted">2 hours ago</span>
+                            </div>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn btn-outline-primary btn-sm" onclick="viewSearchDetails(1)">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Match Details Modal -->
+<div class="modal fade" id="matchDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-person me-2"></i>Match Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="comparison-photo">
+                            <h6>Uploaded Photo</h6>
+                            <img id="uploadedPhoto" class="comparison-img" alt="Uploaded photo">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="comparison-photo">
+                            <h6>Database Photo</h6>
+                            <img id="databasePhoto" class="comparison-img" alt="Database photo">
+                        </div>
+                    </div>
+                </div>
+                <div class="match-analysis mt-4">
+                    <h6>Match Analysis</h6>
+                    <div class="analysis-grid">
+                        <div class="analysis-item">
+                            <div class="analysis-label">Confidence Score</div>
+                            <div class="analysis-value">
+                                <span class="badge bg-success" id="confidenceScore">85%</span>
+                            </div>
+                        </div>
+                        <div class="analysis-item">
+                            <div class="analysis-label">Face Similarity</div>
+                            <div class="analysis-value">
+                                <span class="badge bg-primary" id="faceSimilarity">92%</span>
+                            </div>
+                        </div>
+                        <div class="analysis-item">
+                            <div class="analysis-label">Age Match</div>
+                            <div class="analysis-value">
+                                <span class="badge bg-info" id="ageMatch">Good</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary" onclick="contactMatch()">
+                    <i class="bi bi-telephone me-2"></i>Contact
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let uploadedFile = null;
+let searchInProgress = false;
+
+// File upload handling
+document.getElementById('photoInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        handleFileUpload(file);
+    }
+});
+
+// Drag and drop handling
+const uploadArea = document.getElementById('uploadArea');
+uploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    uploadArea.classList.add('drag-over');
+});
+
+uploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    uploadArea.classList.remove('drag-over');
+});
+
+uploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    uploadArea.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+        handleFileUpload(file);
+    }
+});
+
+function handleFileUpload(file) {
+    uploadedFile = file;
+    
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('previewImage').src = e.target.result;
+        document.getElementById('previewFilename').textContent = file.name;
+        document.getElementById('previewSize').textContent = formatFileSize(file.size);
+        document.getElementById('photoPreview').style.display = 'block';
+        document.getElementById('uploadArea').style.display = 'none';
+        document.getElementById('searchButton').disabled = false;
+    };
+    reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+    uploadedFile = null;
+    document.getElementById('photoPreview').style.display = 'none';
+    document.getElementById('uploadArea').style.display = 'block';
+    document.getElementById('searchButton').disabled = true;
+    document.getElementById('photoInput').value = '';
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function startFaceSearch() {
+    if (!uploadedFile || searchInProgress) return;
+    
+    searchInProgress = true;
+    document.getElementById('searchLoading').style.display = 'block';
+    document.getElementById('searchResults').style.display = 'none';
+    document.getElementById('searchButton').disabled = true;
+    
+    // Show progress
+    updateProgress(20, 'Uploading image...');
+    
+    // Prepare form data
+    const formData = new FormData();
+    formData.append('image', uploadedFile);
+    formData.append('search_type', document.getElementById('searchType').value);
+    formData.append('confidence_threshold', document.getElementById('confidenceThreshold').value);
+    
+    // Send to backend
+    updateProgress(40, 'Detecting faces in image...');
+    
+    // Get CSRF token
+    const csrftoken = getCookie('csrftoken') || document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    
+    fetch('{% url "core:face_search" %}', {
+        method: 'POST',
+        body: formData,
+        headers: csrftoken ? {
+            'X-CSRFToken': csrftoken
+        } : {}
+    })
+    .then(response => response.json())
+    .then(data => {
+        updateProgress(80, 'Searching database...');
+        
+        if (data.error) {
+            updateProgress(100, 'Error occurred');
+            setTimeout(() => {
+                showError(data.error);
+            }, 500);
+            return;
+        }
+        
+        updateProgress(100, 'Analyzing results...');
+        
+        setTimeout(() => {
+            showSearchResults(data.matches || [], data.ai_model);
+        }, 500);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        updateProgress(100, 'Error occurred');
+        setTimeout(() => {
+            showError('An error occurred while searching. Please try again.');
+        }, 500);
+    });
+}
+
+function updateProgress(progress, text) {
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    if (progressBar) progressBar.style.width = progress + '%';
+    if (progressText) progressText.textContent = text;
+}
+
+function showError(errorMessage) {
+    document.getElementById('searchLoading').style.display = 'none';
+    document.getElementById('searchResults').style.display = 'block';
+    document.getElementById('searchButton').disabled = false;
+    searchInProgress = false;
+    
+    const resultsContainer = document.getElementById('searchResults');
+    resultsContainer.innerHTML = `
+        <div class="empty-results">
+            <i class="bi bi-exclamation-triangle"></i>
+            <h6>Search Error</h6>
+            <p class="mb-3">${errorMessage}</p>
+            <button class="btn btn-outline-primary btn-sm" onclick="removePhoto()">
+                <i class="bi bi-arrow-clockwise me-1"></i>Try Another Image
+            </button>
+        </div>
+    `;
+}
+
+function showSearchResults(matches, aiModel) {
+    document.getElementById('searchLoading').style.display = 'none';
+    document.getElementById('searchResults').style.display = 'block';
+    document.getElementById('searchButton').disabled = false;
+    searchInProgress = false;
+    
+    displayResults(matches, aiModel);
+}
+
+// Helper function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function displayResults(results) {
+    const resultsContainer = document.getElementById('searchResults');
+    const resultsCount = document.getElementById('resultsCount');
+    
+    // Update results count with appropriate badge color
+    if (results.length === 0) {
+        resultsCount.textContent = '0 matches';
+        resultsCount.className = 'badge bg-secondary';
+        resultsContainer.innerHTML = `
+            <div class="empty-results">
+                <i class="bi bi-search"></i>
+                <h6>No Matches Found</h6>
+                <p class="mb-3">No potential matches were found in the database. Try adjusting your search sensitivity or using a different image.</p>
+                <button class="btn btn-outline-primary btn-sm" onclick="removePhoto()">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Try Another Image
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    resultsCount.textContent = `${results.length} ${results.length === 1 ? 'match' : 'matches'}`;
+    resultsCount.className = results.length > 0 ? 'badge bg-success' : 'badge bg-secondary';
+    
+    const resultsHTML = results.map((result, index) => {
+        const detailUrl = result.type === 'missing' 
+            ? `/missing/${result.id}/` 
+            : `/found/${result.id}/`;
+        
+        return `
+        <div class="match-result-item" style="animation-delay: ${index * 0.1}s;">
+            <div class="match-photo">
+                <img src="${result.photo_url || '/static/images/placeholder.svg'}" alt="${result.name}" class="match-thumbnail">
+                <div class="position-absolute top-0 start-0 m-2">
+                    <span class="badge bg-dark bg-opacity-75">#${index + 1}</span>
+                </div>
+            </div>
+            <div class="match-content">
+                <div class="match-header">
+                    <h6 class="match-name">${result.name}</h6>
+                    <span class="badge bg-${getConfidenceColor(result.confidence)}">
+                        <i class="bi bi-percent me-1"></i>${result.confidence}% Match
+                    </span>
+                </div>
+                <div class="match-details">
+                    <p class="mb-2">
+                        <i class="bi bi-file-text me-1 text-primary"></i>
+                        <strong>Case ID:</strong> ${result.case_id}
+                    </p>
+                    ${result.age ? `
+                    <p class="mb-2">
+                        <i class="bi bi-calendar3 me-1 text-info"></i>
+                        <strong>Age:</strong> ${result.age} ${result.age === 1 ? 'year' : 'years'}
+                    </p>
+                    ` : ''}
+                    ${result.gender ? `
+                    <p class="mb-2">
+                        <i class="bi bi-gender-ambiguous me-1 text-success"></i>
+                        <strong>Gender:</strong> ${result.gender}
+                    </p>
+                    ` : ''}
+                    ${result.location ? `
+                    <p class="mb-2">
+                        <i class="bi bi-geo-alt-fill me-1 text-danger"></i>
+                        <strong>Location:</strong> ${result.location}
+                    </p>
+                    ` : ''}
+                    ${result.date ? `
+                    <p class="mb-0">
+                        <i class="bi bi-clock-history me-1 text-warning"></i>
+                        <strong>Date:</strong> ${result.date}
+                    </p>
+                    ` : ''}
+                </div>
+            </div>
+            <div class="match-actions">
+                <a href="${detailUrl}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-eye me-1"></i>View Details
+                </a>
+                ${result.type === 'missing' ? `
+                <a href="/report/sighting/${result.id}/" class="btn btn-primary btn-sm">
+                    <i class="bi bi-eye me-1"></i>Report Sighting
+                </a>
+                ` : ''}
+            </div>
+        </div>
+        `;
+    }).join('');
+    
+    resultsContainer.innerHTML = resultsHTML;
+}
+
+function getConfidenceColor(confidence) {
+    if (confidence >= 80) return 'success';
+    if (confidence >= 60) return 'warning';
+    return 'danger';
+}
+
+function viewMatchDetails(matchId) {
+    // In a real app, this would load actual match data
+    document.getElementById('matchDetailsModal').style.display = 'block';
+    // For now, just show alert
+    alert('Match details modal would open here for match ID: ' + matchId);
+}
+
+function contactMatch(matchId) {
+    // In a real app, this would open contact form or redirect to case details
+    alert('Contact form would open here for match ID: ' + matchId);
+}
+
+function viewSearchHistory() {
+    // In a real app, this would load actual search history
+    document.getElementById('searchHistoryModal').style.display = 'block';
+    // For now, just show alert
+    alert('Search history modal would open here');
+}
+
+// Initialize face search
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Face search initialized');
+});
+</script>
+{% endblock %}

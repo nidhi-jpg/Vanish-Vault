@@ -1,0 +1,239 @@
+"""
+Face Recognition Utilities for VanishVault
+Handles AI-powered face matching between uploaded images and database photos
+"""
+import os
+import numpy as np
+from PIL import Image
+import io
+from typing import List, Dict, Tuple, Optional
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.conf import settings
+
+# Note: In production, you would use a proper face recognition library
+# Options include:
+# - face_recognition (uses dlib)
+# - DeepFace
+# - AWS Rekognition API
+# - Azure Face API
+# - Google Cloud Vision API
+
+try:
+    # Try to import face_recognition library
+    import face_recognition
+    FACE_RECOGNITION_AVAILABLE = True
+except ImportError:
+    FACE_RECOGNITION_AVAILABLE = False
+    print("Warning: face_recognition library not installed. Using fallback mode.")
+
+
+def extract_face_encoding(image_path: str) -> Optional[np.ndarray]:
+    """
+    Extract face encoding from an image file.
+    
+    Args:
+        image_path: Path to the image file
+        
+    Returns:
+        Face encoding array or None if no face detected
+    """
+    if not FACE_RECOGNITION_AVAILABLE:
+        # Fallback: Return a dummy encoding for development
+        return np.random.rand(128) if os.path.exists(image_path) else None
+    
+    try:
+        # Load image
+        image = face_recognition.load_image_file(image_path)
+        
+        # Find face locations
+        face_locations = face_recognition.face_locations(image)
+        
+        if not face_locations:
+            return None
+        
+        # Get face encodings (use first face if multiple)
+        face_encodings = face_recognition.face_encodings(image, face_locations)
+        
+        if face_encodings:
+            return face_encodings[0]
+        
+        return None
+    except Exception as e:
+        print(f"Error extracting face encoding: {e}")
+        return None
+
+
+def extract_face_encoding_from_upload(uploaded_file: InMemoryUploadedFile) -> Optional[np.ndarray]:
+    """
+    Extract face encoding from an uploaded file.
+    
+    Args:
+        uploaded_file: Django InMemoryUploadedFile
+        
+    Returns:
+        Face encoding array or None if no face detected
+    """
+    if not FACE_RECOGNITION_AVAILABLE:
+        # Fallback: Return dummy encoding
+        return np.random.rand(128)
+    
+    try:
+        # Read file into memory
+        image_data = uploaded_file.read()
+        image = Image.open(io.BytesIO(image_data))
+        
+        # Convert to RGB if needed
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+        
+        # Convert PIL image to numpy array
+        image_array = np.array(image)
+        
+        # Find face locations
+        face_locations = face_recognition.face_locations(image_array)
+        
+        if not face_locations:
+            return None
+        
+        # Get face encodings
+        face_encodings = face_recognition.face_encodings(image_array, face_locations)
+        
+        if face_encodings:
+            return face_encodings[0]
+        
+        return None
+    except Exception as e:
+        print(f"Error extracting face encoding from upload: {e}")
+        return None
+
+
+def calculate_face_distance(encoding1: np.ndarray, encoding2: np.ndarray) -> float:
+    """
+    Calculate the distance between two face encodings.
+    Lower distance = more similar faces.
+    
+    Args:
+        encoding1: First face encoding
+        encoding2: Second face encoding
+        
+    Returns:
+        Distance value (0.0 = identical, higher = more different)
+    """
+    if not FACE_RECOGNITION_AVAILABLE:
+        # Fallback: Return random distance
+        return np.random.rand()
+    
+    try:
+        # Calculate Euclidean distance
+        distance = face_recognition.face_distance([encoding1], encoding2)[0]
+        return float(distance)
+    except Exception as e:
+        print(f"Error calculating face distance: {e}")
+        return 1.0
+
+
+def distance_to_confidence(distance: float) -> float:
+    """
+    Convert face distance to confidence percentage.
+    
+    Args:
+        distance: Face distance (0.0 to ~1.0)
+        
+    Returns:
+        Confidence percentage (0-100)
+    """
+    # Face distance typically ranges from 0.0 (identical) to ~0.6+ (different)
+    # Convert to confidence: lower distance = higher confidence
+    if distance <= 0.4:
+        # Very similar
+        confidence = 100 - (distance * 150)  # 100% at 0.0, ~40% at 0.4
+    elif distance <= 0.6:
+        # Somewhat similar
+        confidence = 40 - ((distance - 0.4) * 100)  # 40% at 0.4, ~20% at 0.6
+    else:
+        # Not very similar
+        confidence = max(0, 20 - ((distance - 0.6) * 50))
+    
+    return max(0, min(100, confidence))
+
+
+def find_matches(
+    query_encoding: np.ndarray,
+    database_encodings: List[Tuple[object, np.ndarray]],
+    threshold: float = 0.6,
+    max_results: int = 20
+) -> List[Dict]:
+    """
+    Find matching faces in the database.
+    
+    Args:
+        query_encoding: Face encoding from uploaded image
+        database_encodings: List of (person_object, encoding) tuples
+        threshold: Confidence threshold (0.0-1.0, converted to distance)
+        max_results: Maximum number of results to return
+        
+    Returns:
+        List of match dictionaries with person, confidence, and distance
+    """
+    matches = []
+    
+    # Convert threshold to distance (inverse relationship)
+    # threshold 0.6 = 60% confidence = ~0.4 distance
+    max_distance = 1.0 - (threshold * 0.6)
+    
+    for person, db_encoding in database_encodings:
+        if db_encoding is None:
+            continue
+        
+        # Calculate distance
+        distance = calculate_face_distance(query_encoding, db_encoding)
+        
+        # Convert to confidence
+        confidence = distance_to_confidence(distance)
+        
+        # Check if above threshold
+        if distance <= max_distance:
+            matches.append({
+                'person': person,
+                'confidence': round(confidence, 1),
+                'distance': round(distance, 4),
+            })
+    
+    # Sort by confidence (highest first)
+    matches.sort(key=lambda x: x['confidence'], reverse=True)
+    
+    # Return top results
+    return matches[:max_results]
+
+
+def preprocess_image_for_ai(image_path: str) -> Optional[str]:
+    """
+    Preprocess image for better AI recognition (handles sketches, pixelated images).
+    
+    Args:
+        image_path: Path to image file
+        
+    Returns:
+        Path to processed image or None
+    """
+    try:
+        image = Image.open(image_path)
+        
+        # Convert to RGB
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+        
+        # Enhance contrast for sketches/pixelated images
+        from PIL import ImageEnhance
+        enhancer = ImageEnhance.Contrast(image)
+        image = enhancer.enhance(1.2)
+        
+        # Save processed image
+        processed_path = image_path.replace('.', '_processed.')
+        image.save(processed_path, 'JPEG', quality=90)
+        
+        return processed_path
+    except Exception as e:
+        print(f"Error preprocessing image: {e}")
+        return image_path  # Return original if processing fails
+

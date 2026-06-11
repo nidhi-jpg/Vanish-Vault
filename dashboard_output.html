@@ -1,0 +1,2971 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Dashboard - VanishVault</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts - Headings -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    
+    <meta name="theme-color" content="#00ADB5">
+    
+<style>
+/* AI Match Cards Styling */
+.match-card {
+    background: rgba(17,24,39,0.6);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.match-card:hover {
+    border-color: rgba(0,173,181,0.4);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.match-confidence .badge {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+}
+
+.match-comparison {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.match-person {
+    flex: 1;
+    text-align: center;
+}
+
+.match-person-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.8);
+}
+
+.match-photo {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid rgba(255,255,255,0.1);
+    margin: 0 auto 0.75rem;
+    display: block;
+}
+
+.match-photo-placeholder {
+    width: 120px;
+    height: 120px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    border: 2px solid rgba(255,255,255,0.1);
+    margin: 0 auto 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: rgba(255,255,255,0.3);
+}
+
+.match-person-details {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
+}
+
+.match-arrow {
+    font-size: 2rem;
+    color: rgba(0,173,181,0.6);
+}
+
+.match-meta {
+    margin: 1rem 0;
+    padding: 0.75rem;
+    background: rgba(0,0,0,0.2);
+    border-radius: 6px;
+}
+
+.match-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.match-actions .btn {
+    flex: 1;
+    min-width: 120px;
+}
+
+@media (max-width: 768px) {
+    .match-comparison {
+        flex-direction: column;
+    }
+    
+    .match-arrow {
+        transform: rotate(90deg);
+    }
+}
+</style>
+
+</head>
+<body class="dark-theme" style="background:#000;">
+    
+    <div class="page-glass"></div>
+    <!-- Animated Magnifying Glass Background -->
+    <div class="magnifier-bg">
+        <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="80" cy="80" r="60" stroke="#00ADB5" stroke-width="8" fill="none"/>
+            <rect x="120" y="120" width="40" height="8" rx="4" fill="#00ADB5" transform="rotate(45 120 120)"/>
+        </svg>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-xxl">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-search-heart me-2"></i>VanishVault
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link " 
+                           href="/">
+                            <i class="bi bi-house me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link " 
+                           href="/search/">
+                            <i class="bi bi-search me-1"></i>Search
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link " 
+                           href="/found/">
+                            <i class="bi bi-people me-1"></i>Found
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link " 
+                           href="/face-search/">
+                            <i class="bi bi-camera me-1"></i>Face Search
+                        </a>
+                    </li>
+                    
+                        
+                        <li class="nav-item">
+                            <a class="nav-link active" 
+                               href="/dashboard/">
+                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                            </a>
+                        </li>
+                        
+                    
+                </ul>
+                
+                <ul class="navbar-nav">
+                    
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-label="User menu">
+                                <i class="bi bi-person-circle me-1"></i>admin
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><span class="dropdown-item-text small text-white">Administrator</span></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/admin/"><i class="bi bi-gear me-2"></i>Admin</a></li>
+                                <li><a class="dropdown-item" href="/logout/"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container-xxl py-4">
+        
+        
+        
+        
+<!-- Dashboard Header -->
+<div class="dashboard-header mb-4">
+    <div class="row align-items-center">
+        <div class="col-12 col-md-8">
+            <div class="dashboard-title-section">
+                <h1 class="dashboard-title">
+                    <i class="bi bi-speedometer2 me-2"></i>Admin Dashboard
+                </h1>
+                <p class="dashboard-subtitle">Verify users and cases, review AI matches, and monitor system activity</p>
+            </div>
+        </div>
+        <div class="col-12 col-md-4 text-md-end">
+            <div class="dashboard-actions">
+                <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#newCaseModal">
+                    <i class="bi bi-plus me-1"></i>New Case
+                </button>
+                <div class="btn-group">
+                    <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="bi bi-gear me-1"></i>Settings
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-people me-2"></i>User Management</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-file-earmark-text me-2"></i>Reports</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-download me-2"></i>Export Data</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Overview -->
+<div class="row g-4 mb-4">
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="stat-card stat-card-primary">
+            <div class="stat-icon">
+                <i class="bi bi-person-x"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-number">4</h3>
+                <p class="stat-label">Pending Missing Cases</p>
+                <a href="#cases" class="text-white small">View all →</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="stat-card stat-card-success">
+            <div class="stat-icon">
+                <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-number">2</h3>
+                <p class="stat-label">Verified Missing Cases</p>
+                <span class="text-white-50 small">Active cases</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="stat-card stat-card-warning">
+            <div class="stat-icon">
+                <i class="bi bi-person-search"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-number">5</h3>
+                <p class="stat-label">Unidentified Found Persons</p>
+                <a href="#cases" class="text-white small">Review →</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="stat-card stat-card-info">
+            <div class="stat-icon">
+                <i class="bi bi-people"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-number">11</h3>
+                <p class="stat-label">Users Pending Verification</p>
+                <a href="#users" class="text-white small">Verify now →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Stats Row -->
+<div class="row g-4 mb-4">
+    <div class="col-12 col-md-4">
+        <div class="stat-card stat-card-secondary">
+            <div class="stat-icon">
+                <i class="bi bi-robot"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-number">0</h3>
+                <p class="stat-label">AI Matches Pending Review</p>
+                <a href="#ai-matches" class="text-white small">Review matches →</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-md-4">
+        <div class="stat-card stat-card-success">
+            <div class="stat-icon">
+                <i class="bi bi-check2-all"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-number">0</h3>
+                <p class="stat-label">Matches Confirmed This Week</p>
+                <span class="text-white-50 small">Successful reunions</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-md-4">
+        <div class="stat-card stat-card-info">
+            <div class="stat-icon">
+                <i class="bi bi-person-check"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-number">10</h3>
+                <p class="stat-label">Verified Users</p>
+                <span class="text-white-50 small">Out of 21 total</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Tabs -->
+<ul class="nav nav-tabs dashboard-tabs" id="dashboardTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+            <i class="bi bi-house me-2"></i>Overview
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="cases-tab" data-bs-toggle="tab" data-bs-target="#cases" type="button" role="tab">
+            <i class="bi bi-person-x me-2"></i>Case Management
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="sightings-tab" data-bs-toggle="tab" data-bs-target="#sightings" type="button" role="tab">
+            <i class="bi bi-eye me-2"></i>Sighting Review
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="ai-matches-tab" data-bs-toggle="tab" data-bs-target="#ai-matches" type="button" role="tab">
+            <i class="bi bi-robot me-2"></i>AI Face Matches
+            
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+            <i class="bi bi-people me-2"></i>User Management
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
+            <i class="bi bi-graph-up me-2"></i>Reports
+        </button>
+    </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content dashboard-tab-content" id="dashboardTabContent">
+    <!-- Overview Tab -->
+    <div class="tab-pane fade show active" id="overview" role="tabpanel">
+        <div class="row g-4">
+            <!-- Recent Activity -->
+            <div class="col-12 col-lg-8">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h5 class="card-title">
+                            <i class="bi bi-clock-history me-2"></i>Recent Activity
+                        </h5>
+                        <div class="card-actions">
+                            <button class="btn btn-outline-primary btn-sm">View All</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-timeline">
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By admin
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP 127.0.0.1
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 23, 2026 15:59
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By Nidhi Abhay
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP 127.0.0.1
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 23, 2026 15:45
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By Nidhi
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP 127.0.0.1
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 23, 2026 15:44
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By Nidhi
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP 127.0.0.1
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 23, 2026 15:41
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By Nidhi Abhay
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP 127.0.0.1
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:45
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By Ganesh Ganu
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP 127.0.0.1
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:45
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By Ganesh Ganu
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP 127.0.0.1
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:42
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By Nidhi
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP 127.0.0.1
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:42
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By Nidhi
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP 127.0.0.1
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:41
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By Nidhi Abhay
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP 127.0.0.1
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:40
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_admin_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_ngo_user
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_ngo_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_police_user
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_police_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_citizen_user
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_citizen_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_admin_user
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_admin_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_ngo_user
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_ngo_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_police_user
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_police_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_citizen_user
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_citizen_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_admin_user
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_admin_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_ngo_user
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_ngo_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_police_user
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_police_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_citizen_user
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_citizen_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_admin_user
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_admin_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_ngo_user
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_ngo_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_police_user
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_police_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-secondary">
+                                    <i class="bi
+                                         bi-box-arrow-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Logout on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_citizen_user
+                                        
+                                        • ID: 
+                                        <br>User logged out from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-info
+                                    ">
+                                    <i class="bi
+                                         bi-box-arrow-in-right
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Login on 
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By test_citizen_user
+                                        
+                                        • ID: 
+                                        <br>User logged in from IP None
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 20, 2026 13:29
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-success
+                                    ">
+                                    <i class="bi
+                                         bi-check
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Verify on User
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By Nidhi
+                                        
+                                        • ID: 1
+                                        <br>User admin verified via admin action.
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 14, 2026 07:31
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-success
+                                    ">
+                                    <i class="bi
+                                         bi-check
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Verify on User
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By Nidhi
+                                        
+                                        • ID: 4
+                                        <br>User ganu verified via admin action.
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 14, 2026 07:31
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-success
+                                    ">
+                                    <i class="bi
+                                         bi-check
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Verify on User
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By Nidhi
+                                        
+                                        • ID: 5
+                                        <br>User admin1 verified via admin action.
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 14, 2026 07:31
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-success
+                                    ">
+                                    <i class="bi
+                                         bi-check
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Verify on User
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By Nidhi
+                                        
+                                        • ID: 7
+                                        <br>User taniskk verified via admin action.
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 14, 2026 07:31
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-item">
+                                <div class="activity-icon
+                                     bg-success
+                                    ">
+                                    <i class="bi
+                                         bi-check
+                                        "></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">
+                                        Verify on User
+                                    </div>
+                                    <div class="activity-description">
+                                        
+                                            By Nidhi
+                                        
+                                        • ID: 8
+                                        <br>User Nidhi verified via admin action.
+                                    </div>
+                                    <div class="activity-time text-muted small">
+                                        Feb 14, 2026 07:31
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="col-12 col-lg-4">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h5 class="card-title">
+                            <i class="bi bi-lightning me-2"></i>Quick Actions
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="quick-actions">
+                            <button class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#newCaseModal">
+                                <i class="bi bi-plus-circle"></i>
+                                <span>New Case</span>
+                            </button>
+                            <a href="/search/" class="quick-action-btn">
+                                <i class="bi bi-search"></i>
+                                <span>Search Cases</span>
+                            </a>
+                            <button class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#bulkActionsModal">
+                                <i class="bi bi-check2-square"></i>
+                                <span>Bulk Actions</span>
+                            </button>
+                            <button class="quick-action-btn" onclick="exportData()">
+                                <i class="bi bi-download"></i>
+                                <span>Export Data</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Case Management Tab -->
+    <div class="tab-pane fade" id="cases" role="tabpanel">
+        <!-- Missing Cases Section -->
+        <div class="dashboard-card mb-4">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-person-x me-2"></i>Missing Person Cases - Pending Verification
+                </h5>
+                <div class="card-actions">
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="bi bi-funnel me-1"></i>Filter
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Cases</a></li>
+                            <li><a class="dropdown-item" href="#">Pending</a></li>
+                            <li><a class="dropdown-item" href="#">Verified</a></li>
+                            <li><a class="dropdown-item" href="#">Closed</a></li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#newCaseModal">
+                        <i class="bi bi-plus me-1"></i>New Case
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                
+                <div class="table-responsive">
+                    <table class="table table-hover dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" class="form-check-input" id="selectAll">
+                                </th>
+                                <th>Case ID</th>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Last Seen</th>
+                                <th>Status</th>
+                                <th>Reporter</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input case-checkbox" value="14">
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">MP-2026-VHLF8</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        
+                                        <div class="table-photo-placeholder me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        
+                                        <div>
+                                            <span class="fw-medium">Test Missing Person 3</span>
+                                            <div class="text-muted small">F</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>42</td>
+                                <td>
+                                    <div class="text-muted small">
+                                        Test Location 3
+                                        
+                                        <br>Feb 10, 2026
+                                        
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-muted small">
+                                        admin
+                                        
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-warning">
+                                        Pending Verification
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="/missing/14/" class="btn btn-outline-primary" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <form method="post" action="/dashboard/missing/14/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify Case" onclick="return confirm('Verify this missing person case?');">
+                                                <i class="bi bi-check"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/missing/14/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject Case" onclick="return confirm('Reject this case? It will be marked as rejected.');">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input case-checkbox" value="13">
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">MP-2026-7QECI</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        
+                                        <div class="table-photo-placeholder me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        
+                                        <div>
+                                            <span class="fw-medium">Test Missing Person 2</span>
+                                            <div class="text-muted small">M</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>70</td>
+                                <td>
+                                    <div class="text-muted small">
+                                        Test Location 2
+                                        
+                                        <br>Feb 5, 2026
+                                        
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-muted small">
+                                        admin
+                                        
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-warning">
+                                        Pending Verification
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="/missing/13/" class="btn btn-outline-primary" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <form method="post" action="/dashboard/missing/13/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify Case" onclick="return confirm('Verify this missing person case?');">
+                                                <i class="bi bi-check"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/missing/13/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject Case" onclick="return confirm('Reject this case? It will be marked as rejected.');">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input case-checkbox" value="12">
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">MP-2026-EN7NR</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        
+                                        <div class="table-photo-placeholder me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        
+                                        <div>
+                                            <span class="fw-medium">Test Missing Person 1</span>
+                                            <div class="text-muted small">M</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>72</td>
+                                <td>
+                                    <div class="text-muted small">
+                                        Test Location 1
+                                        
+                                        <br>Feb 2, 2026
+                                        
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-muted small">
+                                        admin
+                                        
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-warning">
+                                        Pending Verification
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="/missing/12/" class="btn btn-outline-primary" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <form method="post" action="/dashboard/missing/12/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify Case" onclick="return confirm('Verify this missing person case?');">
+                                                <i class="bi bi-check"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/missing/12/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject Case" onclick="return confirm('Reject this case? It will be marked as rejected.');">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="form-check-input case-checkbox" value="11">
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">MP-2026-QE6OJ</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        
+                                        <img src="/media/missing_persons/nidhi_St9T80w.webp" class="table-photo me-2" alt="Tina Avens">
+                                        
+                                        <div>
+                                            <span class="fw-medium">Tina Avens</span>
+                                            <div class="text-muted small">Female</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>23</td>
+                                <td>
+                                    <div class="text-muted small">
+                                        Near majhiwada thane
+                                        
+                                        <br>Feb 17, 2026
+                                        
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-muted small">
+                                        Nidhi Abhay
+                                        <br>daughter
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-warning">
+                                        Pending Verification
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="/missing/11/" class="btn btn-outline-primary" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <form method="post" action="/dashboard/missing/11/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify Case" onclick="return confirm('Verify this missing person case?');">
+                                                <i class="bi bi-check"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/missing/11/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject Case" onclick="return confirm('Reject this case? It will be marked as rejected.');">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+        </div>
+        
+        <!-- Found Cases Section -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-person-check me-2"></i>Found Person Cases - Pending Verification
+                </h5>
+            </div>
+            <div class="card-body">
+                
+                <div class="table-responsive">
+                    <table class="table table-hover dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>Case ID</th>
+                                <th>Person</th>
+                                <th>Age/Gender</th>
+                                <th>Found Location</th>
+                                <th>Found Date</th>
+                                <th>Organization</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary">FP-2026-BFMK9</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        
+                                        <div class="table-photo-placeholder me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        
+                                        <div>
+                                            <span class="fw-medium">John Doe 3</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    73
+                                     • Male
+                                </td>
+                                <td>Found Location 3</td>
+                                <td>Feb 15, 2026</td>
+                                <td>Test Organization 3</td>
+                                <td>
+                                    <span class="badge bg-warning">Unidentified</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="/found/5/" class="btn btn-outline-primary" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <form method="post" action="/dashboard/found/5/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify Case" onclick="return confirm('Verify this found person case?');">
+                                                <i class="bi bi-check"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/found/5/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject Case" onclick="return confirm('Reject this case?');">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary">FP-2026-XM65S</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        
+                                        <div class="table-photo-placeholder me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        
+                                        <div>
+                                            <span class="fw-medium">John Doe 2</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    78
+                                     • Male
+                                </td>
+                                <td>Found Location 2</td>
+                                <td>Feb 13, 2026</td>
+                                <td>Test Organization 2</td>
+                                <td>
+                                    <span class="badge bg-warning">Unidentified</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="/found/4/" class="btn btn-outline-primary" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <form method="post" action="/dashboard/found/4/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify Case" onclick="return confirm('Verify this found person case?');">
+                                                <i class="bi bi-check"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/found/4/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject Case" onclick="return confirm('Reject this case?');">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary">FP-2026-ENB7G</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        
+                                        <div class="table-photo-placeholder me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        
+                                        <div>
+                                            <span class="fw-medium">John Doe 1</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    66
+                                     • Male
+                                </td>
+                                <td>Found Location 1</td>
+                                <td>Feb 8, 2026</td>
+                                <td>Test Organization 1</td>
+                                <td>
+                                    <span class="badge bg-warning">Unidentified</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="/found/3/" class="btn btn-outline-primary" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <form method="post" action="/dashboard/found/3/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify Case" onclick="return confirm('Verify this found person case?');">
+                                                <i class="bi bi-check"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/found/3/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject Case" onclick="return confirm('Reject this case?');">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary">FP-2025-ZGWSG</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        
+                                        <div class="table-photo-placeholder me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        
+                                        <div>
+                                            <span class="fw-medium">Unknown Female</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    25
+                                     • Female
+                                </td>
+                                <td>Shelter, Denver, CO</td>
+                                <td>Oct 13, 2025</td>
+                                <td>Denver Homeless Shelter</td>
+                                <td>
+                                    <span class="badge bg-warning">Unidentified</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="/found/2/" class="btn btn-outline-primary" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <form method="post" action="/dashboard/found/2/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify Case" onclick="return confirm('Verify this found person case?');">
+                                                <i class="bi bi-check"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/found/2/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject Case" onclick="return confirm('Reject this case?');">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary">FP-2025-HAKHZ</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        
+                                        <div class="table-photo-placeholder me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        
+                                        <div>
+                                            <span class="fw-medium">Unknown Male</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    45
+                                     • Male
+                                </td>
+                                <td>Hospital Emergency Room, Phoe…</td>
+                                <td>Oct 18, 2025</td>
+                                <td>Phoenix General Hospital</td>
+                                <td>
+                                    <span class="badge bg-warning">Unidentified</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="/found/1/" class="btn btn-outline-primary" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <form method="post" action="/dashboard/found/1/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify Case" onclick="return confirm('Verify this found person case?');">
+                                                <i class="bi bi-check"></i>
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/found/1/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject Case" onclick="return confirm('Reject this case?');">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Sighting Review Tab -->
+    <div class="tab-pane fade" id="sightings" role="tabpanel">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-eye me-2"></i>Sighting Review
+                </h5>
+                <div class="card-actions">
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="bi bi-funnel me-1"></i>Filter
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Sightings</a></li>
+                            <li><a class="dropdown-item" href="#">Pending Review</a></li>
+                            <li><a class="dropdown-item" href="#">Verified</a></li>
+                            <li><a class="dropdown-item" href="#">Rejected</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="sightings-list">
+                    <div class="sighting-review-item">
+                        <div class="sighting-header">
+                            <div class="sighting-case">
+                                <strong>Case: #MV-2024-001</strong>
+                                <span class="text-muted">- John Doe</span>
+                            </div>
+                            <div class="sighting-meta">
+                                <span class="badge bg-warning">Pending Review</span>
+                                <span class="text-muted">2 hours ago</span>
+                            </div>
+                        </div>
+                        <div class="sighting-content">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="sighting-details">
+                                        <p><strong>Location:</strong> Downtown Mall, Food Court</p>
+                                        <p><strong>Date & Time:</strong> March 15, 2024 at 2:30 PM</p>
+                                        <p><strong>Description:</strong> Person matching description was seen near the food court. Wearing blue jacket and jeans. Appeared to be looking for someone.</p>
+                                        <p><strong>Reporter:</strong> Anonymous</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="sighting-actions">
+                                        <button class="btn btn-success btn-sm me-2" onclick="verifySighting(1)">
+                                            <i class="bi bi-check me-1"></i>Verify
+                                        </button>
+                                        <button class="btn btn-danger btn-sm me-2" onclick="rejectSighting(1)">
+                                            <i class="bi bi-x me-1"></i>Reject
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="viewSightingDetails(1)">
+                                            <i class="bi bi-eye me-1"></i>Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Face Matches Tab -->
+    <div class="tab-pane fade" id="ai-matches" role="tabpanel">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-robot me-2"></i>AI Face Matching - Review Potential Matches
+                </h5>
+                <div class="card-actions">
+                    <span class="badge bg-info">How it works: AI compares photos and suggests matches. You review and confirm.</span>
+                </div>
+            </div>
+            <div class="card-body">
+                
+                <div class="empty-state">
+                    <i class="bi bi-robot" style="font-size: 4rem; color: rgba(0,173,181,0.3);"></i>
+                    <h5>No AI Matches Pending Review</h5>
+                    <p>The AI system has not found any new potential matches that need your review.</p>
+                    <p class="text-muted small">Matches are created automatically when:</p>
+                    <ul class="text-muted small text-start" style="max-width: 500px; margin: 0 auto;">
+                        <li>A new Missing Person report is added → compared with all Found Person reports</li>
+                        <li>A new Found Person report is added → compared with all Missing Person reports</li>
+                        <li>Face similarity is above 60% confidence threshold</li>
+                    </ul>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- User Management Tab -->
+    <div class="tab-pane fade" id="users" role="tabpanel">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-people me-2"></i>User Management
+                </h5>
+                <div class="card-actions">
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="bi bi-funnel me-1"></i>Filter
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Users</a></li>
+                            <li><a class="dropdown-item" href="#">Pending Verification</a></li>
+                            <li><a class="dropdown-item" href="#">Police</a></li>
+                            <li><a class="dropdown-item" href="#">NGO</a></li>
+                            <li><a class="dropdown-item" href="#">Volunteers</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                
+                <div class="table-responsive">
+                    <table class="table table-hover dashboard-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Organization</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-medium">Test Ngo User</span>
+                                            <div class="text-muted small">test_ngo_2@test.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">NGO Worker</span>
+                                </td>
+                                <td>-</td>
+                                <td>
+                                    <span class="badge bg-warning">Pending Verification</span>
+                                </td>
+                                <td>Feb 23, 2026</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <form method="post" action="/dashboard/user/22/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify User" onclick="return confirm('Verify this user? They will gain full access.');">
+                                                <i class="bi bi-check"></i> Verify
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/user/22/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject User" onclick="return confirm('Reject this user? They will be marked as unverified.');">
+                                                <i class="bi bi-x"></i> Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-medium">Test Police User</span>
+                                            <div class="text-muted small">test_police_1@test.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">Police Officer</span>
+                                </td>
+                                <td>-</td>
+                                <td>
+                                    <span class="badge bg-warning">Pending Verification</span>
+                                </td>
+                                <td>Feb 23, 2026</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <form method="post" action="/dashboard/user/21/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify User" onclick="return confirm('Verify this user? They will gain full access.');">
+                                                <i class="bi bi-check"></i> Verify
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/user/21/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject User" onclick="return confirm('Reject this user? They will be marked as unverified.');">
+                                                <i class="bi bi-x"></i> Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-medium">audit_test_user</span>
+                                            <div class="text-muted small">audit@test.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">Citizen</span>
+                                </td>
+                                <td>-</td>
+                                <td>
+                                    <span class="badge bg-warning">Pending Verification</span>
+                                </td>
+                                <td>Feb 20, 2026</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <form method="post" action="/dashboard/user/18/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify User" onclick="return confirm('Verify this user? They will gain full access.');">
+                                                <i class="bi bi-check"></i> Verify
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/user/18/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject User" onclick="return confirm('Reject this user? They will be marked as unverified.');">
+                                                <i class="bi bi-x"></i> Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-medium">test_ngo_user</span>
+                                            <div class="text-muted small">ngo@test.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">NGO Worker</span>
+                                </td>
+                                <td>-</td>
+                                <td>
+                                    <span class="badge bg-warning">Pending Verification</span>
+                                </td>
+                                <td>Feb 20, 2026</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <form method="post" action="/dashboard/user/16/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify User" onclick="return confirm('Verify this user? They will gain full access.');">
+                                                <i class="bi bi-check"></i> Verify
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/user/16/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject User" onclick="return confirm('Reject this user? They will be marked as unverified.');">
+                                                <i class="bi bi-x"></i> Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-medium">test_police_user</span>
+                                            <div class="text-muted small">police@test.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">Police Officer</span>
+                                </td>
+                                <td>-</td>
+                                <td>
+                                    <span class="badge bg-warning">Pending Verification</span>
+                                </td>
+                                <td>Feb 20, 2026</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <form method="post" action="/dashboard/user/15/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify User" onclick="return confirm('Verify this user? They will gain full access.');">
+                                                <i class="bi bi-check"></i> Verify
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/user/15/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject User" onclick="return confirm('Reject this user? They will be marked as unverified.');">
+                                                <i class="bi bi-x"></i> Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-medium">view_test_user</span>
+                                            <div class="text-muted small">viewtest@example.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">Citizen</span>
+                                </td>
+                                <td>-</td>
+                                <td>
+                                    <span class="badge bg-warning">Pending Verification</span>
+                                </td>
+                                <td>Feb 20, 2026</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <form method="post" action="/dashboard/user/13/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify User" onclick="return confirm('Verify this user? They will gain full access.');">
+                                                <i class="bi bi-check"></i> Verify
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/user/13/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject User" onclick="return confirm('Reject this user? They will be marked as unverified.');">
+                                                <i class="bi bi-x"></i> Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-medium">Test User</span>
+                                            <div class="text-muted small">volunteer@test.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">Volunteer</span>
+                                </td>
+                                <td>-</td>
+                                <td>
+                                    <span class="badge bg-warning">Pending Verification</span>
+                                </td>
+                                <td>Feb 20, 2026</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <form method="post" action="/dashboard/user/12/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify User" onclick="return confirm('Verify this user? They will gain full access.');">
+                                                <i class="bi bi-check"></i> Verify
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/user/12/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject User" onclick="return confirm('Reject this user? They will be marked as unverified.');">
+                                                <i class="bi bi-x"></i> Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-medium">Test User</span>
+                                            <div class="text-muted small">ngo@test.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">NGO Worker</span>
+                                </td>
+                                <td>-</td>
+                                <td>
+                                    <span class="badge bg-warning">Pending Verification</span>
+                                </td>
+                                <td>Feb 20, 2026</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <form method="post" action="/dashboard/user/11/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify User" onclick="return confirm('Verify this user? They will gain full access.');">
+                                                <i class="bi bi-check"></i> Verify
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/user/11/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject User" onclick="return confirm('Reject this user? They will be marked as unverified.');">
+                                                <i class="bi bi-x"></i> Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-medium">Test User</span>
+                                            <div class="text-muted small">police@test.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">Police Officer</span>
+                                </td>
+                                <td>-</td>
+                                <td>
+                                    <span class="badge bg-warning">Pending Verification</span>
+                                </td>
+                                <td>Feb 20, 2026</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <form method="post" action="/dashboard/user/10/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify User" onclick="return confirm('Verify this user? They will gain full access.');">
+                                                <i class="bi bi-check"></i> Verify
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/user/10/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject User" onclick="return confirm('Reject this user? They will be marked as unverified.');">
+                                                <i class="bi bi-x"></i> Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-2">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-medium">Test User</span>
+                                            <div class="text-muted small">citizen@test.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">Citizen</span>
+                                </td>
+                                <td>-</td>
+                                <td>
+                                    <span class="badge bg-warning">Pending Verification</span>
+                                </td>
+                                <td>Feb 20, 2026</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <form method="post" action="/dashboard/user/9/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="verify">
+                                            <button type="submit" class="btn btn-outline-success" title="Verify User" onclick="return confirm('Verify this user? They will gain full access.');">
+                                                <i class="bi bi-check"></i> Verify
+                                            </button>
+                                        </form>
+                                        <form method="post" action="/dashboard/user/9/verify/" class="d-inline">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger" title="Reject User" onclick="return confirm('Reject this user? They will be marked as unverified.');">
+                                                <i class="bi bi-x"></i> Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Tab -->
+    <div class="tab-pane fade" id="reports" role="tabpanel">
+        <div class="row g-4">
+            <div class="col-12 col-lg-6">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h5 class="card-title">
+                            <i class="bi bi-graph-up me-2"></i>Case Statistics
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-placeholder">
+                            <i class="bi bi-bar-chart"></i>
+                            <p>Case statistics chart would be displayed here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h5 class="card-title">
+                            <i class="bi bi-pie-chart me-2"></i>Status Distribution
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-placeholder">
+                            <i class="bi bi-pie-chart"></i>
+                            <p>Status distribution chart would be displayed here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Case Modal -->
+<div class="modal fade" id="newCaseModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>Create New Case
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="/report/missing/">
+                <input type="hidden" name="csrfmiddlewaretoken" value="mFUHeEDiVp9UPYV10ZlS1PHdNSKevZJXLsoiCclwnEl6JJil9xVldXSa1Ovh98xP">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="full_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Age</label>
+                            <input type="number" name="age" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Gender</label>
+                            <select name="gender" class="form-select" required>
+                                <option value="">Select Gender</option>
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                                <option value="O">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Seen Location</label>
+                            <input type="text" name="last_seen_location" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="3" placeholder="Additional details about the missing person..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-2"></i>Create Case
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Actions Modal -->
+<div class="modal fade" id="bulkActionsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-check2-square me-2"></i>Bulk Actions
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Select cases and choose an action to perform:</p>
+                <div class="bulk-actions-list">
+                    <button class="btn btn-outline-success w-100 mb-2" onclick="bulkApprove()">
+                        <i class="bi bi-check me-2"></i>Approve Selected Cases
+                    </button>
+                    <button class="btn btn-outline-danger w-100 mb-2" onclick="bulkReject()">
+                        <i class="bi bi-x me-2"></i>Reject Selected Cases
+                    </button>
+                    <button class="btn btn-outline-primary w-100 mb-2" onclick="bulkExport()">
+                        <i class="bi bi-download me-2"></i>Export Selected Cases
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Case Management Functions
+function approveCase(caseId) {
+    if (confirm('Are you sure you want to approve this case?')) {
+        // In a real app, this would make an AJAX request
+        alert('Case approved successfully!');
+        location.reload();
+    }
+}
+
+function rejectCase(caseId) {
+    if (confirm('Are you sure you want to reject this case?')) {
+        // In a real app, this would make an AJAX request
+        alert('Case rejected.');
+        location.reload();
+    }
+}
+
+function editCase(caseId) {
+    // In a real app, this would open an edit modal or redirect to edit page
+    alert('Edit case functionality would open here');
+}
+
+// Handle case action buttons
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle case action buttons
+    document.querySelectorAll('[data-action]').forEach(button => {
+        button.addEventListener('click', function() {
+            const caseId = this.getAttribute('data-case-id');
+            const action = this.getAttribute('data-action');
+            
+            switch(action) {
+                case 'approve':
+                    approveCase(caseId);
+                    break;
+                case 'reject':
+                    rejectCase(caseId);
+                    break;
+                case 'edit':
+                    editCase(caseId);
+                    break;
+            }
+        });
+    });
+});
+
+// Sighting Management Functions
+function verifySighting(sightingId) {
+    if (confirm('Are you sure you want to verify this sighting?')) {
+        alert('Sighting verified successfully!');
+        location.reload();
+    }
+}
+
+function rejectSighting(sightingId) {
+    if (confirm('Are you sure you want to reject this sighting?')) {
+        alert('Sighting rejected.');
+        location.reload();
+    }
+}
+
+function viewSightingDetails(sightingId) {
+    alert('Sighting details would open here');
+}
+
+// Bulk Actions
+function bulkApprove() {
+    const selected = document.querySelectorAll('.case-checkbox:checked');
+    if (selected.length === 0) {
+        alert('Please select cases to approve');
+        return;
+    }
+    if (confirm(`Are you sure you want to approve ${selected.length} cases?`)) {
+        alert('Selected cases approved successfully!');
+        location.reload();
+    }
+}
+
+function bulkReject() {
+    const selected = document.querySelectorAll('.case-checkbox:checked');
+    if (selected.length === 0) {
+        alert('Please select cases to reject');
+        return;
+    }
+    if (confirm(`Are you sure you want to reject ${selected.length} cases?`)) {
+        alert('Selected cases rejected.');
+        location.reload();
+    }
+}
+
+function bulkExport() {
+    const selected = document.querySelectorAll('.case-checkbox:checked');
+    if (selected.length === 0) {
+        alert('Please select cases to export');
+        return;
+    }
+    alert(`Exporting ${selected.length} cases...`);
+}
+
+// Select All Checkbox
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.case-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+});
+
+// Export Data
+function exportData() {
+    alert('Exporting all data...');
+}
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize any dashboard-specific functionality
+    console.log('Dashboard initialized');
+});
+</script>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto py-4">
+        <div class="container-xxl">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-4 text-center text-md-start">
+                    <small class="text-white">© 2026 VanishVault</small>
+                </div>
+                <div class="col-12 col-md-4 text-center">
+                    <small class="text-white">Search · Identify · Reunite</small>
+                </div>
+                <div class="col-12 col-md-4 text-center text-md-end">
+                    <small class="text-white">
+                        <a href="/policy/access/" class="text-white text-decoration-none me-3">Access & Verification Policy</a>
+                        <a href="#" class="text-white text-decoration-none me-2" aria-label="Twitter">
+                            <i class="bi bi-twitter-x"></i>
+                        </a>
+                        <a href="#" class="text-white text-decoration-none me-2" aria-label="Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="#" class="text-white text-decoration-none" aria-label="GitHub">
+                            <i class="bi bi-github"></i>
+                        </a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

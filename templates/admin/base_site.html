@@ -1,0 +1,17 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">VanishVault Administration</a>
+    {% if user.is_authenticated and user.is_staff %}
+    <a href="{% url 'core:dashboard' %}" style="margin-left: 30px; color: #fff; text-decoration: none; font-weight: normal; font-size: 16px; background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 4px;">
+        <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+    {% endif %}
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

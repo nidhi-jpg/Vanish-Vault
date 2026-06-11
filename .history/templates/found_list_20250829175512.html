@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4 class="mb-3">Unidentified / Found Persons</h4>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-12 col-md-4">
+    <select class="form-select" name="gender">
+      <option value="">Any Gender</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+      <option value="other">Other</option>
+    </select>
+  </div>
+  <div class="col-12 col-md-2">
+    <button class="btn btn-outline-primary w-100" type="submit">Filter</button>
+  </div>
+</form>
+
+<div class="row g-3">
+  {% for p in items %}
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="card h-100">
+      {% if p.photo %}<img src="{{ p.photo.url }}" class="card-img-top" alt="{{ p.possible_name }}">{% endif %}
+      <div class="card-body p-2">
+        <div class="fw-semibold">{{ p.possible_name|default:'Unidentified' }}</div>
+        <div class="text-muted small">{{ p.found_location }}</div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="text-muted">No entries yet.</div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+

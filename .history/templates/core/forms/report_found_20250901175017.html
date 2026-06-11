@@ -1,0 +1,386 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Report Found Person - VanishVault{% endblock %}
+
+{% block content %}
+<!-- Report Found Header -->
+<div class="report-header mb-4">
+    <div class="row align-items-center">
+        <div class="col-12 col-md-8">
+            <div class="report-title-section">
+                <h1 class="report-title">
+                    <i class="bi bi-person-check me-2"></i>Report Found Person
+                </h1>
+                <p class="report-subtitle">Help identify an unidentified person by providing their details and photo</p>
+            </div>
+        </div>
+        <div class="col-12 col-md-4 text-md-end">
+            <div class="report-actions">
+                <a href="{% url 'core:found_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Found List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Found Form -->
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="report-form-card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-clipboard-data me-2"></i>Found Person Information
+                </h5>
+                <p class="card-subtitle">Please provide as much information as possible to help identify this person</p>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" class="report-form">
+                    {% csrf_token %}
+                    
+                    <!-- Step 1: Basic Information -->
+                    <div class="form-step active" id="step1">
+                        <div class="step-header">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h6 class="step-title">Basic Information</h6>
+                                <p class="step-description">Provide basic details about the found person</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.possible_name.id_for_label }}" class="form-label">
+                                        <i class="bi bi-person me-1"></i>Possible Name
+                                    </label>
+                                    {{ form.possible_name }}
+                                    <div class="form-text">If known, otherwise leave blank</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.estimated_age.id_for_label }}" class="form-label">
+                                        <i class="bi bi-calendar me-1"></i>Estimated Age
+                                    </label>
+                                    {{ form.estimated_age }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.gender.id_for_label }}" class="form-label">
+                                        <i class="bi bi-gender-ambiguous me-1"></i>Gender
+                                    </label>
+                                    {{ form.gender }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.height.id_for_label }}" class="form-label">
+                                        <i class="bi bi-rulers me-1"></i>Height
+                                    </label>
+                                    {{ form.height }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Physical Description -->
+                    <div class="form-step" id="step2">
+                        <div class="step-header">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h6 class="step-title">Physical Description</h6>
+                                <p class="step-description">Describe physical characteristics</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.weight.id_for_label }}" class="form-label">
+                                        <i class="bi bi-speedometer me-1"></i>Weight
+                                    </label>
+                                    {{ form.weight }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.hair_color.id_for_label }}" class="form-label">
+                                        <i class="bi bi-palette me-1"></i>Hair Color
+                                    </label>
+                                    {{ form.hair_color }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.eye_color.id_for_label }}" class="form-label">
+                                        <i class="bi bi-eye me-1"></i>Eye Color
+                                    </label>
+                                    {{ form.eye_color }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.distinguishing_features.id_for_label }}" class="form-label">
+                                        <i class="bi bi-tags me-1"></i>Distinguishing Features
+                                    </label>
+                                    {{ form.distinguishing_features }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Found Details -->
+                    <div class="form-step" id="step3">
+                        <div class="step-header">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h6 class="step-title">Found Details</h6>
+                                <p class="step-description">When and where was this person found?</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step-body">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="{{ form.found_location.id_for_label }}" class="form-label">
+                                        <i class="bi bi-geo-alt me-1"></i>Found Location
+                                    </label>
+                                    {{ form.found_location }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.found_date.id_for_label }}" class="form-label">
+                                        <i class="bi bi-calendar-date me-1"></i>Date Found
+                                    </label>
+                                    {{ form.found_date }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.found_time.id_for_label }}" class="form-label">
+                                        <i class="bi bi-clock me-1"></i>Time Found
+                                    </label>
+                                    {{ form.found_time }}
+                                </div>
+                                <div class="col-12">
+                                    <label for="{{ form.notes.id_for_label }}" class="form-label">
+                                        <i class="bi bi-journal-text me-1"></i>Additional Notes
+                                    </label>
+                                    {{ form.notes }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 4: Photo Upload -->
+                    <div class="form-step" id="step4">
+                        <div class="step-header">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h6 class="step-title">Photo Upload</h6>
+                                <p class="step-description">Upload a clear photo of the person</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step-body">
+                            <div class="photo-upload-section">
+                                <div class="upload-area" id="uploadArea">
+                                    <div class="upload-content">
+                                        <i class="bi bi-cloud-upload upload-icon"></i>
+                                        <h6 class="upload-title">Upload Photo</h6>
+                                        <p class="upload-subtitle">Drag & drop or click to browse</p>
+                                        {{ form.photo }}
+                                        <button type="button" class="btn btn-primary" onclick="document.getElementById('id_photo').click()">
+                                            <i class="bi bi-folder me-2"></i>Choose File
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="photo-preview" id="photoPreview" style="display: none;">
+                                    <div class="preview-container">
+                                        <img id="previewImage" class="preview-img" alt="Uploaded photo">
+                                        <div class="preview-overlay">
+                                            <button type="button" class="btn btn-light btn-sm" onclick="removePhoto()">
+                                                <i class="bi bi-x me-1"></i>Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="preview-info">
+                                        <h6 class="preview-filename" id="previewFilename"></h6>
+                                        <p class="preview-size" id="previewSize"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 5: Organization Details -->
+                    <div class="form-step" id="step5">
+                        <div class="step-header">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h6 class="step-title">Organization Details</h6>
+                                <p class="step-description">Your organization information</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step-body">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="{{ form.found_by_organization.id_for_label }}" class="form-label">
+                                        <i class="bi bi-building me-1"></i>Organization Name
+                                    </label>
+                                    {{ form.found_by_organization }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.contact_person.id_for_label }}" class="form-label">
+                                        <i class="bi bi-person me-1"></i>Contact Person
+                                    </label>
+                                    {{ form.contact_person }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.contact_phone.id_for_label }}" class="form-label">
+                                        <i class="bi bi-telephone me-1"></i>Contact Phone
+                                    </label>
+                                    {{ form.contact_phone }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Navigation -->
+                    <div class="form-navigation">
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" id="prevBtn" onclick="changeStep(-1)" style="display: none;">
+                                <i class="bi bi-arrow-left me-2"></i>Previous
+                            </button>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">
+                                    Next<i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                                <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
+                                    <i class="bi bi-check-circle me-2"></i>Submit Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Progress Indicator -->
+<div class="progress-indicator">
+    <div class="progress-steps">
+        <div class="progress-step active" data-step="1">
+            <div class="step-circle">1</div>
+            <div class="step-label">Basic Info</div>
+        </div>
+        <div class="progress-step" data-step="2">
+            <div class="step-circle">2</div>
+            <div class="step-label">Physical</div>
+        </div>
+        <div class="progress-step" data-step="3">
+            <div class="step-circle">3</div>
+            <div class="step-label">Found Details</div>
+        </div>
+        <div class="progress-step" data-step="4">
+            <div class="step-circle">4</div>
+            <div class="step-label">Photo</div>
+        </div>
+        <div class="progress-step" data-step="5">
+            <div class="step-circle">5</div>
+            <div class="step-label">Organization</div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentStep = 1;
+const totalSteps = 5;
+
+// Photo upload handling
+document.getElementById('id_photo').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        handleFileUpload(file);
+    }
+});
+
+// Drag and drop handling
+const uploadArea = document.getElementById('uploadArea');
+uploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    uploadArea.classList.add('drag-over');
+});
+
+uploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    uploadArea.classList.remove('drag-over');
+});
+
+uploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    uploadArea.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+        document.getElementById('id_photo').files = e.dataTransfer.files;
+        handleFileUpload(file);
+    }
+});
+
+function handleFileUpload(file) {
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('previewImage').src = e.target.result;
+        document.getElementById('previewFilename').textContent = file.name;
+        document.getElementById('previewSize').textContent = formatFileSize(file.size);
+        document.getElementById('photoPreview').style.display = 'block';
+        document.getElementById('uploadArea').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+    document.getElementById('photoPreview').style.display = 'none';
+    document.getElementById('uploadArea').style.display = 'block';
+    document.getElementById('id_photo').value = '';
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function changeStep(direction) {
+    const newStep = currentStep + direction;
+    
+    if (newStep < 1 || newStep > totalSteps) return;
+    
+    // Hide current step
+    document.getElementById(`step${currentStep}`).classList.remove('active');
+    document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+    
+    // Show new step
+    currentStep = newStep;
+    document.getElementById(`step${currentStep}`).classList.add('active');
+    document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+    
+    // Update navigation buttons
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (currentStep === 1) {
+        prevBtn.style.display = 'none';
+    } else {
+        prevBtn.style.display = 'inline-block';
+    }
+    
+    if (currentStep === totalSteps) {
+        nextBtn.style.display = 'none';
+        submitBtn.style.display = 'inline-block';
+    } else {
+        nextBtn.style.display = 'inline-block';
+        submitBtn.style.display = 'none';
+    }
+}
+
+// Initialize form
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Report found form initialized');
+});
+</script>
+{% endblock %}

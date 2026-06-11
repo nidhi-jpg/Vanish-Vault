@@ -1,0 +1,280 @@
+<!-- Admin Activity Feed Dashboard Section -->
+<div class="row">
+    <!-- Recent Activity Feed -->
+    <div class="col-12 col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-activity me-2"></i>
+                    Global Activity Feed
+                </h5>
+                <button class="btn btn-sm btn-outline-secondary" onclick="refreshActivityFeed()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="activity-feed" id="activityFeed">
+                    {% for notification in recent_notifications %}
+                    <div class="activity-item d-flex align-items-start mb-3">
+                        <div class="activity-icon me-3">
+                            {% if notification.notification_type == 'case_submitted' %}
+                                <i class="bi bi-person-plus text-primary"></i>
+                            {% elif notification.notification_type == 'case_verified' %}
+                                <i class="bi bi-check-circle text-success"></i>
+                            {% elif notification.notification_type == 'case_rejected' %}
+                                <i class="bi bi-x-circle text-danger"></i>
+                            {% elif notification.notification_type == 'sighting_reported' %}
+                                <i class="bi bi-eye text-info"></i>
+                            {% elif notification.notification_type == 'face_search_performed' %}
+                                <i class="bi bi-search text-warning"></i>
+                            {% elif notification.notification_type == 'high_confidence_match' %}
+                                <i class="bi bi-exclamation-triangle text-danger"></i>
+                            {% elif notification.notification_type == 'police_assigned' %}
+                                <i class="bi bi-shield text-primary"></i>
+                            {% else %}
+                                <i class="bi bi-bell text-secondary"></i>
+                            {% endif %}
+                        </div>
+                        <div class="activity-content flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">{{ notification.title }}</h6>
+                                    <p class="mb-1 text-muted">{{ notification.message }}</p>
+                                    <small class="text-muted">
+                                        <i class="bi bi-person me-1"></i>{{ notification.recipient.get_full_name|default:notification.recipient.username }}
+                                        {% if notification.sender %}
+                                        • <i class="bi bi-arrow-right me-1"></i>{{ notification.sender.get_full_name|default:notification.sender.username }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+                                    {% if notification.priority == 'urgent' %}
+                                        <span class="badge bg-danger ms-2">Urgent</span>
+                                    {% elif notification.priority == 'high' %}
+                                        <span class="badge bg-warning ms-2">High</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if notification.missing_person %}
+                            <div class="mt-2">
+                                <a href="/missing/{{ notification.missing_person.id }}/" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-person me-1"></i>View Case
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-inbox fs-1"></i>
+                        <p class="mt-2">No recent activity</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Face Search Alerts -->
+    <div class="col-12 col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-search me-2"></i>
+                    Face Search Activity
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- High Confidence Matches -->
+                {% if high_confidence_matches %}
+                <div class="alert alert-danger d-flex align-items-center" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <div>
+                        <strong>High Confidence Match!</strong>
+                        <br>
+                        <small>{{ high_confidence_matches.0.get_confidence_percentage }} match found</small>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="face-search-logs">
+                    {% for search in recent_face_searches %}
+                    <div class="search-item mb-3 p-2 border rounded">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>{{ search.performed_by.get_full_name|default:search.performed_by.username }}</strong>
+                                <br>
+                                <small class="text-muted">Searching: {{ search.missing_person.full_name }}</small>
+                            </div>
+                            <div class="text-end">
+                                {% if search.match_score %}
+                                    {% if search.is_high_confidence %}
+                                        <span class="badge bg-danger">{{ search.get_confidence_percentage }}</span>
+                                    {% elif search.is_medium_confidence %}
+                                        <span class="badge bg-warning">{{ search.get_confidence_percentage }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ search.get_confidence_percentage }}</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge bg-secondary">No Match</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <small class="text-muted">{{ search.created_at|timesince }} ago</small>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted py-3">
+                        <i class="bi bi-search fs-3"></i>
+                        <p class="mt-2 mb-0">No recent face searches</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bar-chart me-2"></i>
+                    Quick Stats
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="stat-item">
+                            <h4 class="text-primary">{{ recent_notifications|length }}</h4>
+                            <small class="text-muted">Total Activities</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-item">
+                            <h4 class="text-danger">{{ high_confidence_matches|length }}</h4>
+                            <small class="text-muted">High Confidence</small>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="stat-item">
+                            <h4 class="text-info">{{ recent_face_searches|length }}</h4>
+                            <small class="text-muted">Face Searches</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-item">
+                            <h4 class="text-success">{{ stats.new_cases_today|default:0 }}</h4>
+                            <small class="text-muted">New Cases</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Types Legend -->
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Activity Types</h6>
+                <div class="row">
+                    <div class="col-md-3 col-sm-6">
+                        <small><i class="bi bi-person-plus text-primary me-1"></i> Case Submitted</small>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <small><i class="bi bi-check-circle text-success me-1"></i> Case Verified</small>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <small><i class="bi bi-x-circle text-danger me-1"></i> Case Rejected</small>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <small><i class="bi bi-eye text-info me-1"></i> Sighting Reported</small>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <small><i class="bi bi-search text-warning me-1"></i> Face Search</small>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <small><i class="bi bi-exclamation-triangle text-danger me-1"></i> High Confidence</small>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <small><i class="bi bi-shield text-primary me-1"></i> Police Assigned</small>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <small><i class="bi bi-bell text-secondary me-1"></i> System Alert</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function refreshActivityFeed() {
+    fetch('/api/activity-feed/')
+        .then(response => response.json())
+        .then(data => {
+            // Update the activity feed with new data
+            updateActivityFeed(data.notifications);
+            updateFaceSearches(data.face_searches);
+            updateStats(data.stats);
+        })
+        .catch(error => {
+            console.error('Error refreshing activity feed:', error);
+        });
+}
+
+function updateActivityFeed(notifications) {
+    const feedContainer = document.getElementById('activityFeed');
+    // Implementation to update the feed without page reload
+    // This would require creating an API endpoint
+}
+
+// Auto-refresh every 30 seconds
+setInterval(refreshActivityFeed, 30000);
+</script>
+
+<style>
+.activity-feed {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    padding: 12px;
+    border-left: 3px solid #e9ecef;
+    transition: all 0.2s ease;
+}
+
+.activity-item:hover {
+    background-color: #f8f9fa;
+    border-left-color: #007bff;
+}
+
+.activity-icon {
+    font-size: 1.2rem;
+    width: 30px;
+    text-align: center;
+}
+
+.search-item {
+    transition: background-color 0.2s ease;
+}
+
+.search-item:hover {
+    background-color: #f8f9fa;
+}
+
+.stat-item h4 {
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+</style>

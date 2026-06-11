@@ -1,0 +1,196 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ person.possible_name|default:"Unidentified Person" }} - Found Person Details - VanishVault{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-12 col-lg-4">
+        <div class="detail-photo-card">
+            {% if person.photo %}
+                <img src="{{ person.photo.url }}" class="detail-photo" alt="{{ person.possible_name }}">
+            {% else %}
+                <div class="detail-photo-placeholder">
+                    <i class="bi bi-person"></i>
+                </div>
+            {% endif %}
+            
+            <div class="photo-info p-3">
+                <div class="case-badges mb-3">
+                    <span class="badge bg-warning">{{ person.get_status_display }}</span>
+                    {% if person.case_id %}
+                        <span class="badge bg-secondary">{{ person.case_id }}</span>
+                    {% endif %}
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    This person needs identification. If you recognize them, please contact the organization.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-lg-8">
+        <div class="detail-info-card">
+            <div class="d-flex align-items-start justify-content-between mb-4">
+                <div>
+                    <h1 class="detail-title">{{ person.possible_name|default:"Unidentified Person" }}</h1>
+                    <p class="detail-subtitle">
+                        Found at: {{ person.found_location }}
+                        {% if person.found_date %} on {{ person.found_date }}{% endif %}
+                    </p>
+                </div>
+                <button class="btn btn-outline-success">
+                    <i class="bi bi-search-heart me-2"></i>Check for Matches
+                </button>
+            </div>
+            
+            <!-- Person Details -->
+            <div class="detail-section mb-4">
+                <h3 class="section-title">
+                    <i class="bi bi-person me-2"></i>Person Details
+                </h3>
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <div class="detail-item">
+                            <label>Estimated Age</label>
+                            <span>{{ person.estimated_age|default:'-' }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="detail-item">
+                            <label>Gender</label>
+                            <span>{{ person.get_gender_display|default:'-' }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="detail-item">
+                            <label>Height</label>
+                            <span>{{ person.height|default:'-' }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="detail-item">
+                            <label>Weight</label>
+                            <span>{{ person.weight|default:'-' }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="detail-item">
+                            <label>Hair Color</label>
+                            <span>{{ person.hair_color|default:'-' }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="detail-item">
+                            <label>Eye Color</label>
+                            <span>{{ person.eye_color|default:'-' }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if person.distinguishing_features %}
+                <div class="mt-3">
+                    <div class="detail-item">
+                        <label>Distinguishing Features</label>
+                        <span>{{ person.distinguishing_features }}</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Found Details -->
+            <div class="detail-section mb-4">
+                <h3 class="section-title">
+                    <i class="bi bi-geo-alt me-2"></i>Found Details
+                </h3>
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="detail-item">
+                            <label>Found Location</label>
+                            <span>{{ person.found_location }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="detail-item">
+                            <label>Date Found</label>
+                            <span>{{ person.found_date|default:'-' }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="detail-item">
+                            <label>Time Found</label>
+                            <span>{{ person.found_time|default:'-' }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if person.notes %}
+                <div class="mt-3">
+                    <div class="detail-item">
+                        <label>Notes</label>
+                        <span>{{ person.notes }}</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Organization Information -->
+            <div class="detail-section mb-4">
+                <h3 class="section-title">
+                    <i class="bi bi-building me-2"></i>Organization Information
+                </h3>
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="detail-item">
+                            <label>Found By</label>
+                            <span>{{ person.found_by_organization }}</span>
+                        </div>
+                    </div>
+                    {% if person.contact_person %}
+                    <div class="col-12 col-md-6">
+                        <div class="detail-item">
+                            <label>Contact Person</label>
+                            <span>{{ person.contact_person }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if person.contact_phone %}
+                    <div class="col-12 col-md-6">
+                        <div class="detail-item">
+                            <label>Contact Phone</label>
+                            <span>{{ person.contact_phone }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mt-3">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-telephone me-2"></i>
+                        <strong>To identify this person:</strong> Contact {{ person.found_by_organization }} 
+                        {% if person.contact_phone %}at {{ person.contact_phone }}{% endif %}
+                        with any information that might help identify them.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="detail-actions d-flex gap-2 flex-wrap">
+                <a href="{% url 'core:found_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Found List
+                </a>
+                <button class="btn btn-primary">
+                    <i class="bi bi-search-heart me-2"></i>Check for Matches
+                </button>
+                <button class="btn btn-outline-success">
+                    <i class="bi bi-person-check me-2"></i>I Know This Person
+                </button>
+                <button class="btn btn-outline-primary">
+                    <i class="bi bi-share me-2"></i>Share
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

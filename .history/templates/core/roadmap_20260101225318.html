@@ -1,0 +1,358 @@
+{% extends 'core/base.html' %}
+
+{% block title %}User Roadmap – How to Use VanishVault{% endblock %}
+
+{% block extra_head %}
+<style>
+    .roadmap-page {
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #00ADB5, #FF6B35);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .roadmap-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .roadmap-card {
+        background: var(--bg-card);
+        border: 2px solid rgba(255,255,255,0.1);
+        border-radius: 20px;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .roadmap-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s ease;
+    }
+
+    .roadmap-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        border-color: var(--primary);
+        box-shadow: 0 20px 40px rgba(0,173,181,0.2);
+    }
+
+    .roadmap-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .roadmap-icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 1.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        position: relative;
+        transition: all 0.4s ease;
+    }
+
+    .roadmap-card:hover .roadmap-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .roadmap-icon.search {
+        background: linear-gradient(135deg, rgba(0,173,181,0.2), rgba(0,173,181,0.1));
+        color: #00ADB5;
+        border: 3px solid #00ADB5;
+    }
+
+    .roadmap-icon.report-missing {
+        background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.1));
+        color: #FF6B35;
+        border: 3px solid #FF6B35;
+    }
+
+    .roadmap-icon.sighting {
+        background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(34,197,94,0.1));
+        color: #22c55e;
+        border: 3px solid #22c55e;
+    }
+
+    .roadmap-icon.found {
+        background: linear-gradient(135deg, rgba(255,211,105,0.2), rgba(255,211,105,0.1));
+        color: #ffd369;
+        border: 3px solid #ffd369;
+    }
+
+    .roadmap-icon.face-search {
+        background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(139,92,246,0.1));
+        color: #8b5cf6;
+        border: 3px solid #8b5cf6;
+    }
+
+    .roadmap-icon.dashboard {
+        background: linear-gradient(135deg, rgba(0,255,178,0.2), rgba(0,255,178,0.1));
+        color: #00FFB2;
+        border: 3px solid #00FFB2;
+    }
+
+    .roadmap-card h3 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+
+    .roadmap-card p {
+        color: var(--text-white);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        min-height: 3rem;
+    }
+
+    .roadmap-card .btn {
+        margin-top: 0.5rem;
+        border-radius: 10px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .roadmap-card:hover .btn {
+        transform: scale(1.05);
+    }
+
+    .step-number {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 35px;
+        height: 35px;
+        background: var(--primary);
+        color: #0b1217;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+
+    .quick-tips {
+        background: var(--bg-card);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-top: 3rem;
+    }
+
+    .tip-item {
+        display: flex;
+        align-items: start;
+        gap: 1rem;
+        padding: 1rem;
+        border-radius: 12px;
+        transition: background 0.3s ease;
+    }
+
+    .tip-item:hover {
+        background: rgba(255,255,255,0.05);
+    }
+
+    .tip-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+        .roadmap-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+        }
+
+        .roadmap-icon {
+            width: 80px;
+            height: 80px;
+            font-size: 2.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="roadmap-page">
+    <div class="container-xxl">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="bi bi-compass me-2"></i>User Roadmap</h1>
+            <p class="lead text-white">Simple steps to navigate VanishVault</p>
+            <a href="{% url 'core:home' %}" class="btn btn-outline-secondary mt-3">
+                <i class="bi bi-arrow-left me-2"></i>Back to Home
+            </a>
+        </div>
+
+        <!-- Roadmap Grid -->
+        <div class="roadmap-grid">
+            <!-- Step 1: Search -->
+            <div class="roadmap-card glass">
+                <div class="step-number">1</div>
+                <div class="roadmap-icon search">
+                    <i class="bi bi-search"></i>
+                </div>
+                <h3>Search Database</h3>
+                <p>Browse missing persons and found individuals with filters</p>
+                <a href="{% url 'core:search' %}" class="btn btn-primary">
+                    <i class="bi bi-arrow-right me-1"></i>Search Now
+                </a>
+            </div>
+
+            <!-- Step 2: Report Missing -->
+            <div class="roadmap-card glass">
+                <div class="step-number">2</div>
+                <div class="roadmap-icon report-missing">
+                    <i class="bi bi-person-x"></i>
+                </div>
+                <h3>Report Missing</h3>
+                <p>File a report if someone you know is missing</p>
+                <a href="{% url 'core:report_missing' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-right me-1"></i>Report
+                </a>
+            </div>
+
+            <!-- Step 3: Report Sighting -->
+            <div class="roadmap-card glass">
+                <div class="step-number">3</div>
+                <div class="roadmap-icon sighting">
+                    <i class="bi bi-eye"></i>
+                </div>
+                <h3>Report Sighting</h3>
+                <p>Share if you've seen someone who might be missing</p>
+                <a href="{% url 'core:search' %}" class="btn btn-success">
+                    <i class="bi bi-arrow-right me-1"></i>Report
+                </a>
+            </div>
+
+            <!-- Step 4: Report Found -->
+            <div class="roadmap-card glass">
+                <div class="step-number">4</div>
+                <div class="roadmap-icon found">
+                    <i class="bi bi-person-check"></i>
+                </div>
+                <h3>Report Found</h3>
+                <p>For verified NGO workers - report found persons</p>
+                <a href="{% url 'core:report_found' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-right me-1"></i>Report
+                </a>
+            </div>
+
+            <!-- Step 5: Face Search -->
+            <div class="roadmap-card glass">
+                <div class="step-number">5</div>
+                <div class="roadmap-icon face-search">
+                    <i class="bi bi-camera"></i>
+                </div>
+                <h3>Face Search</h3>
+                <p>Upload a photo to find matches using AI recognition</p>
+                <a href="{% url 'core:face_search' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-right me-1"></i>Try It
+                </a>
+            </div>
+
+            <!-- Step 6: Dashboard -->
+            <div class="roadmap-card glass">
+                <div class="step-number">6</div>
+                <div class="roadmap-icon dashboard">
+                    <i class="bi bi-speedometer2"></i>
+                </div>
+                <h3>Dashboard</h3>
+                <p>For police & admins - manage and verify cases</p>
+                <a href="{% url 'core:dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-right me-1"></i>Access
+                </a>
+            </div>
+        </div>
+
+        <!-- Quick Tips -->
+        <div class="quick-tips glass">
+            <h3 class="h5 fw-bold mb-4 text-center">
+                <i class="bi bi-lightbulb-fill text-warning me-2"></i>Quick Tips
+            </h3>
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <div class="tip-item">
+                        <div class="tip-icon text-primary">
+                            <i class="bi bi-info-circle-fill"></i>
+                        </div>
+                        <div>
+                            <strong class="text-white">Need an account?</strong>
+                            <p class="mb-0 text-white small">Register to access all features</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="tip-item">
+                        <div class="tip-icon text-success">
+                            <i class="bi bi-shield-check-fill"></i>
+                        </div>
+                        <div>
+                            <strong class="text-white">Privacy Protected</strong>
+                            <p class="mb-0 text-white small">Anonymous reporting available</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="tip-item">
+                        <div class="tip-icon text-info">
+                            <i class="bi bi-clock-fill"></i>
+                        </div>
+                        <div>
+                            <strong class="text-white">24/7 Available</strong>
+                            <p class="mb-0 text-white small">Report anytime, day or night</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="tip-item">
+                        <div class="tip-icon text-warning">
+                            <i class="bi bi-question-circle-fill"></i>
+                        </div>
+                        <div>
+                            <strong class="text-white">Need Help?</strong>
+                            <p class="mb-0 text-white small">Check our <a href="{% url 'core:access_policy' %}" class="text-decoration-none">Access Policy</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

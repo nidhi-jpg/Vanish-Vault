@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-12 col-md-5">
+    {% if person.photo %}
+      <img src="{{ person.photo.url }}" class="img-fluid rounded" alt="{{ person.full_name }}">
+    {% endif %}
+  </div>
+  <div class="col-12 col-md-7">
+    <h3 class="fw-bold">{{ person.full_name }}</h3>
+    <p class="text-muted mb-1">Last seen: {{ person.last_seen_location }}{% if person.last_seen_date %} on {{ person.last_seen_date }}{% endif %}</p>
+    <ul class="list-unstyled small">
+      <li><strong>Age:</strong> {{ person.age|default:'-' }}</li>
+      <li><strong>Gender:</strong> {{ person.get_gender_display|default:'-' }}</li>
+    </ul>
+    <p>{{ person.description }}</p>
+    <a href="/search/" class="btn btn-outline-secondary btn-sm">Back to search</a>
+  </div>
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,475 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Report Missing Person - VanishVault{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-10 col-xl-8">
+        <div class="form-container">
+            <!-- Form Header -->
+            <div class="form-header text-center mb-4">
+                <div class="form-icon mb-3">
+                    <i class="bi bi-person-x"></i>
+                </div>
+                <h2 class="form-title">Report Missing Person</h2>
+                <p class="form-subtitle">Help us find your loved one by providing detailed information</p>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="progress-indicator mb-5">
+                <div class="progress-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-circle">1</div>
+                        <div class="step-label">Basic Info</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">Physical Details</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">Last Seen</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-circle">4</div>
+                        <div class="step-label">Photo & Details</div>
+                    </div>
+                    <div class="step" data-step="5">
+                        <div class="step-circle">5</div>
+                        <div class="step-label">Contact Info</div>
+                    </div>
+                </div>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="multi-step-form" id="reportForm">
+                {% csrf_token %}
+                
+                <!-- Step 1: Basic Information -->
+                <div class="form-step active" id="step1">
+                    <div class="step-card">
+                        <div class="step-header">
+                            <h4 class="step-title">
+                                <i class="bi bi-person me-2"></i>Basic Information
+                            </h4>
+                            <p class="step-description">Tell us about the missing person</p>
+                        </div>
+                        
+                        <div class="step-content">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label required">{{ form.full_name.label }}</label>
+                                    {{ form.full_name }}
+                                    {% if form.full_name.errors %}
+                                        <div class="form-text text-danger">{{ form.full_name.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label required">{{ form.age.label }}</label>
+                                    {{ form.age }}
+                                    {% if form.age.errors %}
+                                        <div class="form-text text-danger">{{ form.age.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label required">{{ form.gender.label }}</label>
+                                    {{ form.gender }}
+                                    {% if form.gender.errors %}
+                                        <div class="form-text text-danger">{{ form.gender.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">
+                            Next: Physical Details <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Physical Details -->
+                <div class="form-step" id="step2">
+                    <div class="step-card">
+                        <div class="step-header">
+                            <h4 class="step-title">
+                                <i class="bi bi-rulers me-2"></i>Physical Description
+                            </h4>
+                            <p class="step-description">Help identify the person with physical characteristics</p>
+                        </div>
+                        
+                        <div class="step-content">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.height.label }}</label>
+                                    {{ form.height }}
+                                    {% if form.height.errors %}
+                                        <div class="form-text text-danger">{{ form.height.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.weight.label }}</label>
+                                    {{ form.weight }}
+                                    {% if form.weight.errors %}
+                                        <div class="form-text text-danger">{{ form.weight.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.hair_color.label }}</label>
+                                    {{ form.hair_color }}
+                                    {% if form.hair_color.errors %}
+                                        <div class="form-text text-danger">{{ form.hair_color.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.eye_color.label }}</label>
+                                    {{ form.eye_color }}
+                                    {% if form.eye_color.errors %}
+                                        <div class="form-text text-danger">{{ form.eye_color.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label class="form-label">{{ form.distinguishing_features.label }}</label>
+                                    {{ form.distinguishing_features }}
+                                    {% if form.distinguishing_features.errors %}
+                                        <div class="form-text text-danger">{{ form.distinguishing_features.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-outline-secondary me-2" onclick="prevStep()">
+                            <i class="bi bi-arrow-left me-2"></i>Back
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">
+                            Next: Last Seen <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Last Seen Information -->
+                <div class="form-step" id="step3">
+                    <div class="step-card">
+                        <div class="step-header">
+                            <h4 class="step-title">
+                                <i class="bi bi-geo-alt me-2"></i>Last Seen Information
+                            </h4>
+                            <p class="step-description">When and where was the person last seen?</p>
+                        </div>
+                        
+                        <div class="step-content">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label required">{{ form.last_seen_location.label }}</label>
+                                    {{ form.last_seen_location }}
+                                    {% if form.last_seen_location.errors %}
+                                        <div class="form-text text-danger">{{ form.last_seen_location.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label required">{{ form.last_seen_date.label }}</label>
+                                    {{ form.last_seen_date }}
+                                    {% if form.last_seen_date.errors %}
+                                        <div class="form-text text-danger">{{ form.last_seen_date.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ form.last_seen_time.label }}</label>
+                                    {{ form.last_seen_time }}
+                                    {% if form.last_seen_time.errors %}
+                                        <div class="form-text text-danger">{{ form.last_seen_time.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label class="form-label">{{ form.description.label }}</label>
+                                    {{ form.description }}
+                                    {% if form.description.errors %}
+                                        <div class="form-text text-danger">{{ form.description.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-outline-secondary me-2" onclick="prevStep()">
+                            <i class="bi bi-arrow-left me-2"></i>Back
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">
+                            Next: Photo & Details <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Photo Upload -->
+                <div class="form-step" id="step4">
+                    <div class="step-card">
+                        <div class="step-header">
+                            <h4 class="step-title">
+                                <i class="bi bi-camera me-2"></i>Photo & Additional Details
+                            </h4>
+                            <p class="step-description">Upload a clear photo and provide any additional information</p>
+                        </div>
+                        
+                        <div class="step-content">
+                            <div class="photo-upload-section mb-4">
+                                <label class="form-label required">{{ form.photo.label }}</label>
+                                <div class="photo-upload-area" id="photoUploadArea">
+                                    <div class="upload-placeholder">
+                                        <i class="bi bi-cloud-upload"></i>
+                                        <p>Click to upload or drag and drop</p>
+                                        <small>PNG, JPG, JPEG up to 10MB</small>
+                                    </div>
+                                    <input type="file" name="photo" id="id_photo" accept="image/*" style="display: none;">
+                                </div>
+                                <div class="photo-preview" id="photoPreview" style="display: none;">
+                                    <img id="previewImage" src="" alt="Preview">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removePhoto()">
+                                        <i class="bi bi-trash"></i> Remove
+                                    </button>
+                                </div>
+                                {% if form.photo.errors %}
+                                    <div class="form-text text-danger">{{ form.photo.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <strong>Photo Guidelines:</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li>Use a clear, recent photo</li>
+                                    <li>Face should be clearly visible</li>
+                                    <li>Good lighting and resolution</li>
+                                    <li>No filters or heavy editing</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-outline-secondary me-2" onclick="prevStep()">
+                            <i class="bi bi-arrow-left me-2"></i>Back
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">
+                            Next: Contact Info <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 5: Contact Information -->
+                <div class="form-step" id="step5">
+                    <div class="step-card">
+                        <div class="step-header">
+                            <h4 class="step-title">
+                                <i class="bi bi-telephone me-2"></i>Your Contact Information
+                            </h4>
+                            <p class="step-description">How can we reach you for updates?</p>
+                        </div>
+                        
+                        <div class="step-content">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label required">{{ form.reporter_relationship.label }}</label>
+                                    {{ form.reporter_relationship }}
+                                    {% if form.reporter_relationship.errors %}
+                                        <div class="form-text text-danger">{{ form.reporter_relationship.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label class="form-label required">{{ form.reporter_phone.label }}</label>
+                                    {{ form.reporter_phone }}
+                                    {% if form.reporter_phone.errors %}
+                                        <div class="form-text text-danger">{{ form.reporter_phone.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="consent-section mt-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="consentCheck" required>
+                                    <label class="form-check-label" for="consentCheck">
+                                        I consent to VanishVault sharing my contact information with law enforcement 
+                                        and authorized personnel for the purpose of finding the missing person.
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" id="privacyCheck" required>
+                                    <label class="form-check-label" for="privacyCheck">
+                                        I understand that this information will be used solely for reuniting 
+                                        missing persons and will be handled according to our privacy policy.
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-warning mt-3">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <strong>Important:</strong> Please ensure all information is accurate. 
+                                False reports may be subject to legal action.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-outline-secondary me-2" onclick="prevStep()">
+                            <i class="bi bi-arrow-left me-2"></i>Back
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="bi bi-send me-2"></i>Submit Report
+                        </button>
+                    </div>
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger mt-3">
+                        {{ form.non_field_errors.0 }}
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentStep = 1;
+const totalSteps = 5;
+
+function showStep(step) {
+    // Hide all steps
+    document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+    // Show current step
+    document.getElementById(`step${step}`).classList.add('active');
+    
+    // Update progress indicator
+    document.querySelectorAll('.progress-steps .step').forEach((stepEl, index) => {
+        if (index + 1 <= step) {
+            stepEl.classList.add('active');
+        } else {
+            stepEl.classList.remove('active');
+        }
+    });
+}
+
+function nextStep() {
+    if (validateCurrentStep()) {
+        if (currentStep < totalSteps) {
+            currentStep++;
+            showStep(currentStep);
+        }
+    }
+}
+
+function prevStep() {
+    if (currentStep > 1) {
+        currentStep--;
+        showStep(currentStep);
+    }
+}
+
+function validateCurrentStep() {
+    const currentStepEl = document.getElementById(`step${currentStep}`);
+    const requiredFields = currentStepEl.querySelectorAll('[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            field.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            field.classList.remove('is-invalid');
+        }
+    });
+    
+    return isValid;
+}
+
+// Photo upload functionality
+document.getElementById('photoUploadArea').addEventListener('click', function() {
+    document.getElementById('id_photo').click();
+});
+
+document.getElementById('id_photo').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('previewImage').src = e.target.result;
+            document.getElementById('photoUploadArea').style.display = 'none';
+            document.getElementById('photoPreview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+function removePhoto() {
+    document.getElementById('id_photo').value = '';
+    document.getElementById('photoUploadArea').style.display = 'block';
+    document.getElementById('photoPreview').style.display = 'none';
+}
+
+// Drag and drop for photo upload
+document.getElementById('photoUploadArea').addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.classList.add('drag-over');
+});
+
+document.getElementById('photoUploadArea').addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.classList.remove('drag-over');
+});
+
+document.getElementById('photoUploadArea').addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.classList.remove('drag-over');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        document.getElementById('id_photo').files = files;
+        document.getElementById('id_photo').dispatchEvent(new Event('change'));
+    }
+});
+
+// Form submission validation
+document.getElementById('reportForm').addEventListener('submit', function(e) {
+    if (!validateCurrentStep()) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Check consent checkboxes
+    const consentCheck = document.getElementById('consentCheck');
+    const privacyCheck = document.getElementById('privacyCheck');
+    
+    if (!consentCheck.checked || !privacyCheck.checked) {
+        e.preventDefault();
+        alert('Please accept the consent and privacy terms to continue.');
+        return false;
+    }
+    
+    // Show loading state
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Submitting...';
+    submitBtn.disabled = true;
+});
+</script>
+{% endblock %}
