@@ -1,29 +1,8 @@
-# VanishVault - AI Face Matching Requirements
-
-# Core Django dependencies
-Django>=4.2.0
+Django>=4.2,<5
+gunicorn>=21.2.0
+whitenoise>=6.6.0
+dj-database-url>=2.1.0
+psycopg[binary]>=3.1.18
 Pillow>=10.0.0
 numpy>=1.24.0
-
-# AI Face Recognition Libraries (choose one or both)
-
-# Option 1: DeepFace (Recommended - Most Accurate)
-# Supports multiple models: VGG-Face, Facenet, OpenFace, ArcFace
-# Better accuracy, handles various image qualities
-deepface>=0.0.79
-tensorflow>=2.13.0  # Required by DeepFace
-opencv-python>=4.8.0  # Required by DeepFace
-
-# Option 2: face_recognition (Alternative - Faster)
-# Built on dlib, good for real-time applications
-# Note: Requires dlib which needs C++ build tools on Windows
-face-recognition>=1.3.0
-dlib>=19.24.0  # May require manual installation on some systems
-
-# Optional: For better performance
-# gdown>=4.7.0  # For downloading pre-trained models
-# retinaface>=0.0.15  # Alternative face detector (more accurate)
-
-# Development dependencies
-# python-dotenv>=1.0.0  # For environment variables
-
+opencv-python-headless>=4.8.0
